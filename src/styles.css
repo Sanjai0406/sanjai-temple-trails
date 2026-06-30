@@ -136,3 +136,15 @@
   -webkit-background-clip: text;
   color: transparent;
 }
+
+@utility input {
+  height: 2.5rem;
+  width: 100%;
+  border-radius: 0.75rem;
+  background-color: color-mix(in oklch, var(--input) 40%, transparent);
+  border: 1px solid var(--border);
+  padding-inline: 0.75rem;
+  outline: none;
+  font-size: 0.875rem;
+}
+.input:focus { box-shadow: 0 0 0 2px var(--primary); }
