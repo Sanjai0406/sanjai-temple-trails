@@ -4,12 +4,12 @@ import { useMemo, useState } from "react";
 import { listTemples } from "@/lib/temples.functions";
 import { TempleCard } from "@/components/TempleCard";
 import { CATEGORIES, TAMIL_STATES } from "@/lib/constants";
-import { Search } from "lucide-react";
+import { Search as SearchIcon } from "lucide-react";
 
-type Search = { q?: string; category?: string; state?: string };
+type SearchParams = { q?: string; category?: string; state?: string };
 
 export const Route = createFileRoute("/explore")({
-  validateSearch: (s: Record<string, unknown>): Search => ({
+  validateSearch: (s: Record<string, unknown>): SearchParams => ({
     q: typeof s.q === "string" ? s.q : undefined,
     category: typeof s.category === "string" ? s.category : undefined,
     state: typeof s.state === "string" ? s.state : undefined,
@@ -42,15 +42,15 @@ function Explore() {
       <div className="glass rounded-2xl p-3 sticky top-16 z-30 mb-4">
         <div className="flex flex-col md:flex-row gap-2">
           <div className="flex-1 flex items-center gap-2 bg-card rounded-xl px-3 border border-border">
-            <Search className="size-4 text-muted-foreground" />
+            <SearchIcon className="size-4 text-muted-foreground" />
             <input
-              value={q} onChange={(e) => { setQ(e.target.value); navigate({ search: (s: Search) => ({ ...s, q: e.target.value || undefined }) }); }}
+              value={q} onChange={(e) => { setQ(e.target.value); navigate({ search: (s: SearchParams) => ({ ...s, q: e.target.value || undefined }) }); }}
               placeholder="Search by name, city, deity…"
               className="flex-1 h-10 bg-transparent outline-none text-sm"
             />
           </div>
           <select
-            value={state} onChange={(e) => { setState(e.target.value); navigate({ search: (s: Search) => ({ ...s, state: e.target.value || undefined }) }); }}
+            value={state} onChange={(e) => { setState(e.target.value); navigate({ search: (s: SearchParams) => ({ ...s, state: e.target.value || undefined }) }); }}
             className="h-10 rounded-xl bg-card border border-border px-3 text-sm"
           >
             <option value="">All states</option>
@@ -61,7 +61,7 @@ function Explore() {
           {CATEGORIES.map((c) => (
             <button
               key={c.id}
-              onClick={() => { setCat(c.id); navigate({ search: (s: Search) => ({ ...s, category: c.id === "all" ? undefined : c.id }) }); }}
+              onClick={() => { setCat(c.id); navigate({ search: (s: SearchParams) => ({ ...s, category: c.id === "all" ? undefined : c.id }) }); }}
               className={`shrink-0 px-3 py-1.5 rounded-full text-xs font-medium border transition ${
                 cat === c.id ? "bg-primary text-primary-foreground border-primary" : "bg-card border-border hover:bg-accent"
               }`}
