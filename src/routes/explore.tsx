@@ -44,13 +44,13 @@ function Explore() {
           <div className="flex-1 flex items-center gap-2 bg-card rounded-xl px-3 border border-border">
             <Search className="size-4 text-muted-foreground" />
             <input
-              value={q} onChange={(e) => { setQ(e.target.value); navigate({ search: (s) => ({ ...s, q: e.target.value || undefined }) }); }}
+              value={q} onChange={(e) => { setQ(e.target.value); navigate({ search: (s: Search) => ({ ...s, q: e.target.value || undefined }) }); }}
               placeholder="Search by name, city, deity…"
               className="flex-1 h-10 bg-transparent outline-none text-sm"
             />
           </div>
           <select
-            value={state} onChange={(e) => { setState(e.target.value); navigate({ search: (s) => ({ ...s, state: e.target.value || undefined }) }); }}
+            value={state} onChange={(e) => { setState(e.target.value); navigate({ search: (s: Search) => ({ ...s, state: e.target.value || undefined }) }); }}
             className="h-10 rounded-xl bg-card border border-border px-3 text-sm"
           >
             <option value="">All states</option>
@@ -61,7 +61,7 @@ function Explore() {
           {CATEGORIES.map((c) => (
             <button
               key={c.id}
-              onClick={() => { setCat(c.id); navigate({ search: (s) => ({ ...s, category: c.id === "all" ? undefined : c.id }) }); }}
+              onClick={() => { setCat(c.id); navigate({ search: (s: Search) => ({ ...s, category: c.id === "all" ? undefined : c.id }) }); }}
               className={`shrink-0 px-3 py-1.5 rounded-full text-xs font-medium border transition ${
                 cat === c.id ? "bg-primary text-primary-foreground border-primary" : "bg-card border-border hover:bg-accent"
               }`}
