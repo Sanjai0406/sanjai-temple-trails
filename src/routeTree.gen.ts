@@ -9,14 +9,45 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as WishlistRouteImport } from './routes/wishlist'
+import { Route as VisitedRouteImport } from './routes/visited'
+import { Route as ProfileRouteImport } from './routes/profile'
+import { Route as PlannerRouteImport } from './routes/planner'
 import { Route as ExploreRouteImport } from './routes/explore'
+import { Route as ChatRouteImport } from './routes/chat'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as TempleSlugRouteImport } from './routes/temple.$slug'
 import { Route as ApiChatRouteImport } from './routes/api/chat'
 
+const WishlistRoute = WishlistRouteImport.update({
+  id: '/wishlist',
+  path: '/wishlist',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const VisitedRoute = VisitedRouteImport.update({
+  id: '/visited',
+  path: '/visited',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProfileRoute = ProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PlannerRoute = PlannerRouteImport.update({
+  id: '/planner',
+  path: '/planner',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ExploreRoute = ExploreRouteImport.update({
   id: '/explore',
   path: '/explore',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ChatRoute = ChatRouteImport.update({
+  id: '/chat',
+  path: '/chat',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthRoute = AuthRouteImport.update({
@@ -29,6 +60,11 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const TempleSlugRoute = TempleSlugRouteImport.update({
+  id: '/temple/$slug',
+  path: '/temple/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiChatRoute = ApiChatRouteImport.update({
   id: '/api/chat',
   path: '/api/chat',
@@ -38,44 +74,134 @@ const ApiChatRoute = ApiChatRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/chat': typeof ChatRoute
   '/explore': typeof ExploreRoute
+  '/planner': typeof PlannerRoute
+  '/profile': typeof ProfileRoute
+  '/visited': typeof VisitedRoute
+  '/wishlist': typeof WishlistRoute
   '/api/chat': typeof ApiChatRoute
+  '/temple/$slug': typeof TempleSlugRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/chat': typeof ChatRoute
   '/explore': typeof ExploreRoute
+  '/planner': typeof PlannerRoute
+  '/profile': typeof ProfileRoute
+  '/visited': typeof VisitedRoute
+  '/wishlist': typeof WishlistRoute
   '/api/chat': typeof ApiChatRoute
+  '/temple/$slug': typeof TempleSlugRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/chat': typeof ChatRoute
   '/explore': typeof ExploreRoute
+  '/planner': typeof PlannerRoute
+  '/profile': typeof ProfileRoute
+  '/visited': typeof VisitedRoute
+  '/wishlist': typeof WishlistRoute
   '/api/chat': typeof ApiChatRoute
+  '/temple/$slug': typeof TempleSlugRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/auth' | '/explore' | '/api/chat'
+  fullPaths:
+    | '/'
+    | '/auth'
+    | '/chat'
+    | '/explore'
+    | '/planner'
+    | '/profile'
+    | '/visited'
+    | '/wishlist'
+    | '/api/chat'
+    | '/temple/$slug'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/auth' | '/explore' | '/api/chat'
-  id: '__root__' | '/' | '/auth' | '/explore' | '/api/chat'
+  to:
+    | '/'
+    | '/auth'
+    | '/chat'
+    | '/explore'
+    | '/planner'
+    | '/profile'
+    | '/visited'
+    | '/wishlist'
+    | '/api/chat'
+    | '/temple/$slug'
+  id:
+    | '__root__'
+    | '/'
+    | '/auth'
+    | '/chat'
+    | '/explore'
+    | '/planner'
+    | '/profile'
+    | '/visited'
+    | '/wishlist'
+    | '/api/chat'
+    | '/temple/$slug'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthRoute: typeof AuthRoute
+  ChatRoute: typeof ChatRoute
   ExploreRoute: typeof ExploreRoute
+  PlannerRoute: typeof PlannerRoute
+  ProfileRoute: typeof ProfileRoute
+  VisitedRoute: typeof VisitedRoute
+  WishlistRoute: typeof WishlistRoute
   ApiChatRoute: typeof ApiChatRoute
+  TempleSlugRoute: typeof TempleSlugRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/wishlist': {
+      id: '/wishlist'
+      path: '/wishlist'
+      fullPath: '/wishlist'
+      preLoaderRoute: typeof WishlistRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/visited': {
+      id: '/visited'
+      path: '/visited'
+      fullPath: '/visited'
+      preLoaderRoute: typeof VisitedRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/profile': {
+      id: '/profile'
+      path: '/profile'
+      fullPath: '/profile'
+      preLoaderRoute: typeof ProfileRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/planner': {
+      id: '/planner'
+      path: '/planner'
+      fullPath: '/planner'
+      preLoaderRoute: typeof PlannerRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/explore': {
       id: '/explore'
       path: '/explore'
       fullPath: '/explore'
       preLoaderRoute: typeof ExploreRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/chat': {
+      id: '/chat'
+      path: '/chat'
+      fullPath: '/chat'
+      preLoaderRoute: typeof ChatRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/auth': {
@@ -92,6 +218,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/temple/$slug': {
+      id: '/temple/$slug'
+      path: '/temple/$slug'
+      fullPath: '/temple/$slug'
+      preLoaderRoute: typeof TempleSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/chat': {
       id: '/api/chat'
       path: '/api/chat'
@@ -105,8 +238,14 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthRoute: AuthRoute,
+  ChatRoute: ChatRoute,
   ExploreRoute: ExploreRoute,
+  PlannerRoute: PlannerRoute,
+  ProfileRoute: ProfileRoute,
+  VisitedRoute: VisitedRoute,
+  WishlistRoute: WishlistRoute,
   ApiChatRoute: ApiChatRoute,
+  TempleSlugRoute: TempleSlugRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
