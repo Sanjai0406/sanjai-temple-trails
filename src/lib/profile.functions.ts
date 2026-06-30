@@ -70,7 +70,15 @@ export const getProfile = createServerFn({ method: "GET" })
 
 export const updateProfile = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((data: Record<string, unknown>) => data)
+  .inputValidator((data: {
+    display_name?: string;
+    home_city?: string;
+    home_state?: string;
+    preferred_travel_mode?: string;
+    daily_budget?: number;
+    walking_difficulty?: string;
+    food_preference?: string;
+  }) => data)
   .handler(async ({ data, context }) => {
     const { error } = await context.supabase.from("profiles").update(data).eq("id", context.userId);
     if (error) throw new Error(error.message);
