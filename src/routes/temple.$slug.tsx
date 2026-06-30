@@ -68,7 +68,7 @@ function TempleDetail() {
               <div className="flex gap-2">
                 {t.is_unesco && <span className="text-xs px-2 py-0.5 rounded-full bg-gold text-temple font-semibold">UNESCO</span>}
                 {t.is_hidden_gem && <span className="text-xs px-2 py-0.5 rounded-full bg-temple text-primary-foreground font-semibold">Hidden Gem</span>}
-                {t.is_ancient && <span className="text-xs px-2 py-0.5 rounded-full bg-accent text-foreground font-semibold">Ancient</span>}
+                {t.architecture && <span className="text-xs px-2 py-0.5 rounded-full bg-accent text-foreground font-semibold">{t.architecture}</span>}
               </div>
               <h1 className="font-display text-3xl sm:text-4xl font-bold mt-2">{t.name}</h1>
               {t.deity && <div className="text-primary mt-1">{t.deity}</div>}
@@ -88,9 +88,9 @@ function TempleDetail() {
 
           <div className="grid sm:grid-cols-4 gap-3 mt-6 text-sm">
             <Stat icon={Star} label="Rating" value={`${t.rating ?? "4.5"} / 5`} />
-            <Stat icon={Clock} label="Timings" value={t.timings ?? "5 AM – 9 PM"} />
+            <Stat icon={Clock} label="Timings" value={t.timing ?? "5 AM – 9 PM"} />
             <Stat icon={Shirt} label="Dress" value={t.dress_code ?? "Traditional"} />
-            <Stat icon={IndianRupee} label="Entry" value={t.entry_fee ? `₹${t.entry_fee}` : "Free"} />
+            <Stat icon={IndianRupee} label="Budget" value={t.estimated_budget ? `₹${t.estimated_budget}` : "Free"} />
           </div>
 
           {t.description && (
