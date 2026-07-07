@@ -63,13 +63,15 @@ function TempleDetail() {
   });
 
   const onShare = async () => {
-    const url = typeof window !== "undefined" ? window.location.href : "";
-    const shareData = { title: t?.name ?? "Sanjai's Travel AI", text: `Discover ${t?.name} on Sanjai's Travel AI`, url };
+    if (typeof window === "undefined") return;
+    const url = window.location.href;
+    const nav = window.navigator as Navigator & { share?: (d: ShareData) => Promise<void> };
+    const shareData: ShareData = { title: t?.name ?? "Sanjai's Travel AI", text: `Discover ${t?.name} on Sanjai's Travel AI`, url };
     try {
-      if (typeof navigator !== "undefined" && "share" in navigator) {
-        await navigator.share(shareData);
+      if (nav.share) {
+        await nav.share(shareData);
       } else {
-        await navigator.clipboard.writeText(url);
+        await nav.clipboard.writeText(url);
         toast.success("Link copied to clipboard 🔗");
       }
     } catch { /* user cancelled */ }
