@@ -2,9 +2,10 @@ import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { getTemple } from "@/lib/temples.functions";
 import { addToWishlist, addVisited } from "@/lib/profile.functions";
+import { refreshTemplePhoto } from "@/lib/temple-photo.functions";
 import { WeatherWidget } from "@/components/WeatherWidget";
 import { MapEmbed } from "@/components/MapEmbed";
-import { ArrowLeft, Heart, CheckCircle2, MapPin, Clock, Shirt, Star, IndianRupee } from "lucide-react";
+import { ArrowLeft, Heart, CheckCircle2, MapPin, Clock, Shirt, Star, IndianRupee, RefreshCw } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useEffect, useState } from "react";
@@ -44,6 +45,16 @@ function TempleDetail() {
     onSuccess: () => { toast.success("Marked as visited ✅"); qc.invalidateQueries({ queryKey: ["visited"] }); },
     onError: (e: Error) => toast.error(e.message),
   });
+  const refreshMut = useMutation({
+    mutationFn: () => refreshTemplePhoto({ data: { slug } }),
+    onSuccess: () => {
+      toast.success("Photo refreshed from Google 📸");
+      qc.invalidateQueries({ queryKey: ["temple", slug] });
+      qc.invalidateQueries({ queryKey: ["temples"] });
+      qc.invalidateQueries({ queryKey: ["featured"] });
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
 
   if (!t) return null;
   const lat = Number(t.latitude ?? 13.0827);
@@ -54,10 +65,19 @@ function TempleDetail() {
       <div className="relative aspect-[16/8] sm:aspect-[16/6] overflow-hidden">
         {t.hero_image && <img src={t.hero_image} alt={t.name} className="size-full object-cover" />}
         <div className="absolute inset-0 bg-gradient-to-t from-background via-background/30 to-temple/40" />
-        <div className="absolute inset-x-0 top-0 p-4">
+        <div className="absolute inset-x-0 top-0 p-4 flex items-center justify-between">
           <Link to="/explore" className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full bg-white/20 backdrop-blur text-white text-sm">
             <ArrowLeft className="size-4" /> Back
           </Link>
+          <button
+            onClick={() => authed ? refreshMut.mutate() : toast.info("Sign in to refresh photo")}
+            disabled={refreshMut.isPending}
+            title="Re-fetch photo from Google Maps"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/20 backdrop-blur text-white text-xs font-medium hover:bg-white/30 transition disabled:opacity-60"
+          >
+            <RefreshCw className={`size-3.5 ${refreshMut.isPending ? "animate-spin" : ""}`} />
+            {refreshMut.isPending ? "Refreshing…" : "Refresh photo"}
+          </button>
         </div>
       </div>
 
