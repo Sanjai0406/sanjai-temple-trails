@@ -1,11 +1,11 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { getTemple } from "@/lib/temples.functions";
+import { getTemple, nearbyTemples } from "@/lib/temples.functions";
 import { addToWishlist, addVisited } from "@/lib/profile.functions";
 import { refreshTemplePhoto } from "@/lib/temple-photo.functions";
 import { WeatherWidget } from "@/components/WeatherWidget";
 import { MapEmbed } from "@/components/MapEmbed";
-import { ArrowLeft, Heart, CheckCircle2, MapPin, Clock, Shirt, Star, IndianRupee, RefreshCw } from "lucide-react";
+import { ArrowLeft, Heart, CheckCircle2, MapPin, Clock, Shirt, Star, IndianRupee, RefreshCw, Share2, Navigation } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useEffect, useState } from "react";
@@ -56,6 +56,27 @@ function TempleDetail() {
     onError: (e: Error) => toast.error(e.message),
   });
 
+  const { data: nearby } = useQuery({
+    queryKey: ["nearby", slug],
+    queryFn: () => nearbyTemples({ data: { slug, limit: 6 } }),
+    enabled: !!t,
+  });
+
+  const onShare = async () => {
+    if (typeof window === "undefined") return;
+    const url = window.location.href;
+    const nav = window.navigator as Navigator & { share?: (d: ShareData) => Promise<void> };
+    const shareData: ShareData = { title: t?.name ?? "Sanjai's Travel AI", text: `Discover ${t?.name} on Sanjai's Travel AI`, url };
+    try {
+      if (nav.share) {
+        await nav.share(shareData);
+      } else {
+        await nav.clipboard.writeText(url);
+        toast.success("Link copied to clipboard 🔗");
+      }
+    } catch { /* user cancelled */ }
+  };
+
   if (!t) return null;
   const lat = Number(t.latitude ?? 13.0827);
   const lng = Number(t.longitude ?? 80.2707);
@@ -94,15 +115,19 @@ function TempleDetail() {
               {t.deity && <div className="text-primary mt-1">{t.deity}</div>}
               <div className="text-sm text-muted-foreground mt-1 flex items-center gap-1"><MapPin className="size-3" />{t.city}, {t.state}</div>
             </div>
-            <div className="flex gap-2">
+            <div className="flex gap-2 flex-wrap">
               <button
                 onClick={() => authed ? wishMut.mutate() : toast.info("Sign in to save")}
-                className="px-4 py-2 rounded-xl border border-border bg-card hover:bg-accent text-sm font-medium inline-flex items-center gap-1"
+                className="px-4 py-2 rounded-xl border border-border bg-card hover:bg-accent text-sm font-medium inline-flex items-center gap-1 transition hover:-translate-y-0.5"
               ><Heart className="size-4 text-primary" /> Wishlist</button>
               <button
                 onClick={() => authed ? visitMut.mutate() : toast.info("Sign in to save")}
-                className="px-4 py-2 rounded-xl gradient-hero text-primary-foreground text-sm font-medium inline-flex items-center gap-1"
+                className="px-4 py-2 rounded-xl gradient-hero text-primary-foreground text-sm font-medium inline-flex items-center gap-1 transition hover:-translate-y-0.5 animate-gold-glow"
               ><CheckCircle2 className="size-4" /> Visited</button>
+              <button
+                onClick={onShare}
+                className="px-4 py-2 rounded-xl border border-border bg-card hover:bg-accent text-sm font-medium inline-flex items-center gap-1 transition hover:-translate-y-0.5"
+              ><Share2 className="size-4" /> Share</button>
             </div>
           </div>
 
@@ -139,6 +164,37 @@ function TempleDetail() {
           </div>
           <WeatherWidget lat={lat} lng={lng} place={t.city ?? t.state} />
         </div>
+
+        {/* NEARBY DESTINATIONS */}
+        {nearby && nearby.length > 0 && (
+          <div className="mt-8 mb-12">
+            <div className="flex items-center gap-2 mb-4">
+              <Navigation className="size-4 text-primary" />
+              <h3 className="font-display text-xl font-semibold">Nearby destinations</h3>
+            </div>
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-3 stagger">
+              {nearby.map((n) => (
+                <Link
+                  key={n.slug}
+                  to="/temple/$slug"
+                  params={{ slug: n.slug }}
+                  className="temple-card hover:temple-card-hover overflow-hidden group flex"
+                >
+                  <div className="relative w-24 sm:w-28 shrink-0 bg-muted">
+                    {n.hero_image && <img src={n.hero_image} alt={n.name} loading="lazy" className="size-full object-cover group-hover:scale-105 transition duration-500" />}
+                  </div>
+                  <div className="p-3 flex-1 min-w-0">
+                    <div className="font-display font-semibold text-sm leading-tight line-clamp-1">{n.name}</div>
+                    <div className="text-[11px] text-muted-foreground mt-0.5 flex items-center gap-1">
+                      <MapPin className="size-3" />{n.city}, {n.state}
+                    </div>
+                    <div className="text-[11px] text-primary font-medium mt-1">{n.distance_km} km away</div>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

@@ -1,10 +1,10 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { useEffect, useState } from "react";
-import { ArrowRight, Compass, MessageCircle, MapPin, Heart, CheckCircle2, Sun, Calendar } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
+import { ArrowRight, Compass, MessageCircle, MapPin, Heart, CheckCircle2, Sun, Calendar, Sparkles } from "lucide-react";
 import heroImg from "@/assets/hero-temple.jpg";
 import { supabase } from "@/integrations/supabase/client";
-import { featuredTemples } from "@/lib/temples.functions";
+import { featuredTemples, monthPicks } from "@/lib/temples.functions";
 import { TempleCard } from "@/components/TempleCard";
 import { WeatherWidget } from "@/components/WeatherWidget";
 
@@ -24,8 +24,16 @@ const QUICK = [
   { to: "/chat", label: "AI Chat", icon: MessageCircle, hint: "Temple Explorer" },
 ];
 
+const MONTH_LABEL = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+const SEASON_ICON = ["❄️","❄️","🌸","🌸","☀️","🌧️","🌧️","🌧️","🍃","🍂","🪔","🪔"];
+
 function HomePage() {
   const { data: temples } = useQuery({ queryKey: ["featured"], queryFn: () => featuredTemples() });
+  const month = new Date().getMonth();
+  const { data: monthly } = useQuery({
+    queryKey: ["monthPicks", month],
+    queryFn: () => monthPicks({ data: { month, limit: 12 } }),
+  });
   const [name, setName] = useState("Sanjai");
   const navigate = useNavigate();
   const [q, setQ] = useState("");
@@ -38,6 +46,12 @@ function HomePage() {
   }, []);
 
   const today = temples?.[0];
+  const diyas = useMemo(() => Array.from({ length: 14 }, (_, i) => ({
+    left: `${(i * 7 + 5) % 95}%`,
+    delay: `${(i * 0.8) % 12}s`,
+    duration: `${10 + (i % 5) * 2}s`,
+    size: 4 + (i % 4),
+  })), []);
 
   return (
     <div>
@@ -46,8 +60,18 @@ function HomePage() {
         <div className="absolute inset-0">
           <img src={heroImg} alt="Temple at dawn" width={1920} height={1280} className="size-full object-cover" />
           <div className="absolute inset-0 bg-gradient-to-b from-temple/40 via-temple/60 to-background" />
+          {/* Floating diyas */}
+          <div className="absolute inset-0 overflow-hidden pointer-events-none">
+            {diyas.map((d, i) => (
+              <span
+                key={i}
+                className="diya"
+                style={{ left: d.left, width: d.size, height: d.size, animationDelay: d.delay, animationDuration: d.duration }}
+              />
+            ))}
+          </div>
         </div>
-        <div className="relative mx-auto max-w-7xl px-4 pt-16 pb-24 sm:pt-24 sm:pb-32 text-primary-foreground">
+        <div className="relative mx-auto max-w-7xl px-4 pt-16 pb-24 sm:pt-24 sm:pb-32 text-primary-foreground animate-fade-up">
           <div className="text-sm font-medium opacity-90">Vanakkam, {name} 🙏</div>
           <h1 className="font-display text-4xl sm:text-6xl font-bold leading-[1.05] mt-2 max-w-3xl">
             Your spiritual<br /> journey across <span className="text-gold">Bharat</span> begins here.
@@ -122,17 +146,84 @@ function HomePage() {
         </section>
       )}
 
+      {/* PERFECT FOR THIS MONTH — horizontal season-aware rail */}
+      {monthly && monthly.length > 0 && (
+        <section className="mx-auto max-w-7xl px-4 mt-14">
+          <div className="flex items-end justify-between mb-4">
+            <div>
+              <div className="inline-flex items-center gap-1.5 text-xs uppercase tracking-wider text-primary font-semibold">
+                <Sparkles className="size-3.5" /> Perfect this {MONTH_LABEL[month]}
+              </div>
+              <h2 className="font-display text-2xl sm:text-3xl font-bold mt-1">
+                <span className="mr-2">{SEASON_ICON[month]}</span>
+                Where the weather blesses your journey
+              </h2>
+              <p className="text-sm text-muted-foreground">Handpicked by season — hills in summer, waterfalls in monsoon, temples in winter.</p>
+            </div>
+            <Link to="/explore" className="hidden sm:inline text-sm text-primary font-medium">View all →</Link>
+          </div>
+          <div className="relative -mx-4 px-4">
+            <div className="flex gap-4 overflow-x-auto pb-3 snap-x snap-mandatory scroll-smooth stagger">
+              {monthly.map((t) => (
+                <Link
+                  key={t.slug}
+                  to="/temple/$slug"
+                  params={{ slug: t.slug }}
+                  className="snap-start shrink-0 w-64 sm:w-72 temple-card overflow-hidden hover:temple-card-hover group"
+                >
+                  <div className="relative aspect-[4/5] overflow-hidden bg-muted">
+                    {t.hero_image && (
+                      <img
+                        src={t.hero_image}
+                        alt={t.name}
+                        loading="lazy"
+                        className="size-full object-cover transition-transform duration-700 group-hover:scale-110"
+                      />
+                    )}
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
+                    <div className="absolute top-2 left-2 text-[10px] px-2 py-0.5 rounded-full bg-gold/90 text-temple font-semibold">
+                      {t.best_time ?? MONTH_LABEL[month]}
+                    </div>
+                    <div className="absolute bottom-3 left-3 right-3 text-white">
+                      <div className="font-display font-semibold text-lg leading-tight line-clamp-1">{t.name}</div>
+                      <div className="text-xs opacity-90 flex items-center gap-1"><MapPin className="size-3" />{t.city}, {t.state}</div>
+                    </div>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
       {/* FEATURED GRID */}
       <section className="mx-auto max-w-7xl px-4 mt-12">
         <div className="flex items-end justify-between mb-4">
           <div>
-            <div className="text-xs uppercase tracking-wider text-muted-foreground">Curated for Sanjai</div>
+            <div className="text-xs uppercase tracking-wider text-muted-foreground">Curated for {name}</div>
             <h2 className="font-display text-2xl font-bold">Sacred places to discover</h2>
           </div>
           <Link to="/explore" className="text-sm text-primary font-medium">View all →</Link>
         </div>
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 stagger">
           {temples?.slice(0, 8).map((t) => <TempleCard key={t.slug} t={t} />)}
+        </div>
+      </section>
+
+      {/* MARQUEE FOOTER TAGLINE */}
+      <section className="mt-16 py-8 border-t border-border overflow-hidden">
+        <div className="flex gap-12 whitespace-nowrap animate-marquee text-2xl sm:text-3xl font-display font-semibold text-muted-foreground/60">
+          {Array.from({ length: 2 }).map((_, i) => (
+            <div key={i} className="flex gap-12 shrink-0">
+              <span>🕉️ Temples of Bharat</span>
+              <span>🪔 Ancient wisdom</span>
+              <span>⛰️ Sacred mountains</span>
+              <span>💧 Holy rivers</span>
+              <span>🌺 Divine journeys</span>
+              <span>🦚 Tamil heritage</span>
+              <span>🏛️ UNESCO wonders</span>
+            </div>
+          ))}
         </div>
       </section>
     </div>
