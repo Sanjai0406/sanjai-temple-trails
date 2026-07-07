@@ -164,6 +164,37 @@ function TempleDetail() {
           </div>
           <WeatherWidget lat={lat} lng={lng} place={t.city ?? t.state} />
         </div>
+
+        {/* NEARBY DESTINATIONS */}
+        {nearby && nearby.length > 0 && (
+          <div className="mt-8 mb-12">
+            <div className="flex items-center gap-2 mb-4">
+              <Navigation className="size-4 text-primary" />
+              <h3 className="font-display text-xl font-semibold">Nearby destinations</h3>
+            </div>
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-3 stagger">
+              {nearby.map((n) => (
+                <Link
+                  key={n.slug}
+                  to="/temple/$slug"
+                  params={{ slug: n.slug }}
+                  className="temple-card hover:temple-card-hover overflow-hidden group flex"
+                >
+                  <div className="relative w-24 sm:w-28 shrink-0 bg-muted">
+                    {n.hero_image && <img src={n.hero_image} alt={n.name} loading="lazy" className="size-full object-cover group-hover:scale-105 transition duration-500" />}
+                  </div>
+                  <div className="p-3 flex-1 min-w-0">
+                    <div className="font-display font-semibold text-sm leading-tight line-clamp-1">{n.name}</div>
+                    <div className="text-[11px] text-muted-foreground mt-0.5 flex items-center gap-1">
+                      <MapPin className="size-3" />{n.city}, {n.state}
+                    </div>
+                    <div className="text-[11px] text-primary font-medium mt-1">{n.distance_km} km away</div>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
