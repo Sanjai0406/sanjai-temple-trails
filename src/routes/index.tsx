@@ -146,17 +146,84 @@ function HomePage() {
         </section>
       )}
 
+      {/* PERFECT FOR THIS MONTH — horizontal season-aware rail */}
+      {monthly && monthly.length > 0 && (
+        <section className="mx-auto max-w-7xl px-4 mt-14">
+          <div className="flex items-end justify-between mb-4">
+            <div>
+              <div className="inline-flex items-center gap-1.5 text-xs uppercase tracking-wider text-primary font-semibold">
+                <Sparkles className="size-3.5" /> Perfect this {MONTH_LABEL[month]}
+              </div>
+              <h2 className="font-display text-2xl sm:text-3xl font-bold mt-1">
+                <span className="mr-2">{SEASON_ICON[month]}</span>
+                Where the weather blesses your journey
+              </h2>
+              <p className="text-sm text-muted-foreground">Handpicked by season — hills in summer, waterfalls in monsoon, temples in winter.</p>
+            </div>
+            <Link to="/explore" className="hidden sm:inline text-sm text-primary font-medium">View all →</Link>
+          </div>
+          <div className="relative -mx-4 px-4">
+            <div className="flex gap-4 overflow-x-auto pb-3 snap-x snap-mandatory scroll-smooth stagger">
+              {monthly.map((t) => (
+                <Link
+                  key={t.slug}
+                  to="/temple/$slug"
+                  params={{ slug: t.slug }}
+                  className="snap-start shrink-0 w-64 sm:w-72 temple-card overflow-hidden hover:temple-card-hover group"
+                >
+                  <div className="relative aspect-[4/5] overflow-hidden bg-muted">
+                    {t.hero_image && (
+                      <img
+                        src={t.hero_image}
+                        alt={t.name}
+                        loading="lazy"
+                        className="size-full object-cover transition-transform duration-700 group-hover:scale-110"
+                      />
+                    )}
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
+                    <div className="absolute top-2 left-2 text-[10px] px-2 py-0.5 rounded-full bg-gold/90 text-temple font-semibold">
+                      {t.best_time ?? MONTH_LABEL[month]}
+                    </div>
+                    <div className="absolute bottom-3 left-3 right-3 text-white">
+                      <div className="font-display font-semibold text-lg leading-tight line-clamp-1">{t.name}</div>
+                      <div className="text-xs opacity-90 flex items-center gap-1"><MapPin className="size-3" />{t.city}, {t.state}</div>
+                    </div>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
       {/* FEATURED GRID */}
       <section className="mx-auto max-w-7xl px-4 mt-12">
         <div className="flex items-end justify-between mb-4">
           <div>
-            <div className="text-xs uppercase tracking-wider text-muted-foreground">Curated for Sanjai</div>
+            <div className="text-xs uppercase tracking-wider text-muted-foreground">Curated for {name}</div>
             <h2 className="font-display text-2xl font-bold">Sacred places to discover</h2>
           </div>
           <Link to="/explore" className="text-sm text-primary font-medium">View all →</Link>
         </div>
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 stagger">
           {temples?.slice(0, 8).map((t) => <TempleCard key={t.slug} t={t} />)}
+        </div>
+      </section>
+
+      {/* MARQUEE FOOTER TAGLINE */}
+      <section className="mt-16 py-8 border-t border-border overflow-hidden">
+        <div className="flex gap-12 whitespace-nowrap animate-marquee text-2xl sm:text-3xl font-display font-semibold text-muted-foreground/60">
+          {Array.from({ length: 2 }).map((_, i) => (
+            <div key={i} className="flex gap-12 shrink-0">
+              <span>🕉️ Temples of Bharat</span>
+              <span>🪔 Ancient wisdom</span>
+              <span>⛰️ Sacred mountains</span>
+              <span>💧 Holy rivers</span>
+              <span>🌺 Divine journeys</span>
+              <span>🦚 Tamil heritage</span>
+              <span>🏛️ UNESCO wonders</span>
+            </div>
+          ))}
         </div>
       </section>
     </div>
