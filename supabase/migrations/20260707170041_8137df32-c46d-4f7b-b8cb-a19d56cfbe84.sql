@@ -1,0 +1,30 @@
+UPDATE public.temples AS t
+SET hero_image = v.url
+FROM (VALUES
+  ('tiruvannamalai-arunachala', 'https://lh3.googleusercontent.com/place-photos/AJRVUZM84_JEYtmtFNG8Q4lOfN6AeGt6Y9BFsL59-9z4hCe-xN69mDJ85LVLFt_ZSDtGRf96jADsIdnWzMvjJTAlZsCddFpELmjqzlW_N3ABHggLwqjIWPbs53KfAX3S14KWL45jRamIOASDNkULgg=s4800-w1600'),
+  ('brihadeeswarar-thanjavur', 'https://lh3.googleusercontent.com/place-photos/AJRVUZNg3Ha4xRNQe2KsN7009Uk-PXnjEIxwmDib2UKuJJc7u-0UaTOuVOIBC564n1Dclrpl-rEVxGkNpEvIyldcXEmVB6gosVM-qyte4pfApCz0t4cnqnIb1W2XxBZ-KFFBwqFAtnTbCXdKk9BWIVfNETlQ=s4800-w1600'),
+  ('chidambaram-nataraja', 'https://lh3.googleusercontent.com/place-photos/AJRVUZNItUStdPvVs2SP-MaS6s8KqVRF5_bh1NPFiaMh1ueJ4-FL0St1maRj8Ypzh2EYIpdLBXimL5AM6Sy6DpCHGvEWhKR0zqSkNb87lRfoiCtRpIOcnC12MQ0HnQN2ljT_EFaqLbQDjBDMvd3ybw=s4800-w1600'),
+  ('courtallam', 'https://lh3.googleusercontent.com/place-photos/AJRVUZPCVcKTL71y61Z8Rz1-mzRtXZ5EJQk2jJ8kMMbl3PHxVawcA3i5IWJoVgsoSvEUZpVrf5QNokX5krFwYxjoIk76U3t-9m50h2beZcp8-O6c2ysnteGJNDArUSrnQI3P1pr4P3DpUWrzqkTI=s4800-w1600'),
+  ('rameswaram-dhanushkodi', 'https://lh3.googleusercontent.com/place-photos/AJRVUZMljxj0FzZYwtrXcr0WKzMi0QI81cM7tT8FZ4TFZz192-8nE2wXqnosg3k0SM7xpQWdwlP2dGxGKEjIxMN-xVvuJM04VL2wbbjbYP-2iHg6cJlwXRsSkY6KTENyFA1ghArqyVKsb1hxTU5bR-KtiyoesQ=s4800-w720'),
+  ('gokarna', 'https://lh3.googleusercontent.com/place-photos/AJRVUZO8bSYYHIqDf-SZ6dmAK4cYuY-aiDK36I2_w0RhbfbQlJGh_9O_xtn4lcqHpI9693cHAplmJh6X_1NsvIWFnoAwbzPmwLGe1I8ESbFdxGWG3jTUMFFGm3wMdN_n1ShY3_o4z2QYsrl0OSJMAg=s4800-w1080'),
+  ('guruvayur', 'https://lh3.googleusercontent.com/place-photos/AJRVUZPYwLgq9f60oI6o_fTbVeQ1sXdBGQhKUXLkyH7mXjVDWZZnJ7vkTgpBBD8vvRyWh9R31KzL-Jf1EDI5HpXUPWi90a2HN18Jg7r-ATAS_dOAP_HJmeXptRaPq-B04cksrcVQmiptiSofvjRz4EymOZtnMw=s4800-w1280'),
+  ('hampi', 'https://lh3.googleusercontent.com/place-photos/AJRVUZNxq6qFCRgtlhQrzWU7dUyB31zmlHSQkIna63VkW6VP4EENeLvmt6cvKGUfhFNI4r0OlPQGfP42ERwfZIAILLKxK1YCT3Fy3cdboQSeD5MMvYQAqrpBAXBQJhb98euOHUw2s0q9lMujbB0m=s4800-w1600'),
+  ('hogenakkal', 'https://lh3.googleusercontent.com/place-photos/AJRVUZMC_DrWPSJEpSqsCD480QvTe-9dT4O3nl43Co1V5kolikbNTqt6C0Tjsfjqw5Okdz1g4zQulc-23JodXQmcpEwkrv9smzubX4KqbUgQ2wri8ChuZeWc3W7cq6ojYSpc7UHBQlAfA7xf2nMRS80F83aR3w=s4800-w1600'),
+  ('jagannath-puri', 'https://lh3.googleusercontent.com/place-photos/AJRVUZM76oCxyeIG_Qm-gOoC74Bqg_Vrrtv-5HKeIikDGNgj8RtwuiE8hDo3qlVv1HuS0kaEgfoQG0v7oziBNjsTMJj6M0rDyEKTEf6qoFvGxUNChzyMsMr3JqwjLFlI_PW330hncykN-i1IyUSJ2qXwqSis=s4800-w1080'),
+  ('kanchi-kamakshi', 'https://lh3.googleusercontent.com/place-photos/AJRVUZPTnFwIaAO0QiCrU7E318REkngaep5PbWkO_9PqESrDBsoESKzKpK5otVO7WXxaCAHFe8S3OWmKcBvchClJ9dkdC8Mg4BuA8zKLHBwL3143AqNQh_bV1WXbapx3x6SC6njKCSn9zLq9AKstt-8=s4800-w1600'),
+  ('kashi-vishwanath', 'https://lh3.googleusercontent.com/place-photos/AJRVUZMljO_l4lmZOaQQalDQWA9D4nJm0NkfQn7LJb25zqektv688HkSOldC_yajUGjcWS8OIpBR1MCbr1vUmKkxQIx6t25e-9Pz56ZPxc9fUUhCQ6Nu1KGs_L8FvOrPH6Xu7Hw3jOvYb2bDbJkdqlT9UWDD=s4800-w1080'),
+  ('kodaikanal', 'https://lh3.googleusercontent.com/place-photos/AJRVUZPhgVd2rblwrnjeYMHxQzStNHOwWwjqP1r3uMHB690eTlWnCgdfFaO5CmB0lmK7_QJ36biMyp84Ivb5aW9R36xZdTd-fiI_PG3a1UfCEjQXnbJeYl6CtdYLh7a54bPEhr2U2px6YSF6goFWBM-edjRSfQ=s4800-w1600'),
+  ('meenakshi-madurai', 'https://lh3.googleusercontent.com/place-photos/AJRVUZNfmJQssn4UwpkZStOUumnlUwq0c8xaniiDUPLtDzUsd02X4paZh4SNRCs74riZ6129eHwHPDYg0X6SgpKl8kJZrA5LN9YGoWSwh-BddtOHyH9p1gzhyAysICTf80BL-K2btMWYm1D_rc59_w=s4800-w800'),
+  ('munnar', 'https://lh3.googleusercontent.com/place-photos/AJRVUZN1DRtXKgKyDfpxanf9WFEy7-bBtcapV8LC9gT0Ywkw4ELL8j8pUI7mIZSqZvegnReR-qHqfMDOaHiaCEUXEy_rlOBwzKM4jcKnp8ust4xLGpW1hBa2OyjycNwGvWPVBHNyZ71uwz3ihVvQ=s4800-w1600'),
+  ('ooty', 'https://lh3.googleusercontent.com/place-photos/AJRVUZMsskjiwvxf-xoipq26ZM3xB_iDojXZfdrwQAsdphp88iazJ7LY9Qz-anC7TElZm_UTzy_7DXKb8lAwr4mmOzE9y58niSuIaS5Ir0xKIdEZ56amtrMIQanD6jK8C_AWEEpuF55mPsm1EWB7=s4800-w1280'),
+  ('palani-murugan', 'https://lh3.googleusercontent.com/place-photos/AJRVUZPCwgi1tQTgX9oVbH-5HlUO07GSIN82Go5rgG4VNe_Z5miEAHoyX6125nvnUITytXTkVsmgTr2J2tY6sbZQfOb-e6Jod2WYqXiB2QkK6Ao6sbgLTZI98xIUdYRivT-HnsdAPOdkidbQSXaIv2w=s4800-w1080'),
+  ('rameshwaram', 'https://lh3.googleusercontent.com/place-photos/AJRVUZOoPMqXdPIyAFX7lD9bY-xYRNudIM4wqP0Gkdugf-3Ekm1Ais90xMk6wSWgvD7BYAEe7xxvpgr6oy-R7rQMTwc9hKGGwE-XVjxHFUlvyoHhj2a8JAJw72b4DaNywmcx4NsusmgCIDHq6dWI7A=s4800-w1600'),
+  ('sabarimala', 'https://lh3.googleusercontent.com/place-photos/AJRVUZMdBolQj5avxyzIKVIZF9mgZXYGBgot4QYXku2L37eWlAbIAxSuKkIHALe39IGuBNyPVcrDykQ3XQES3zVqPaRHgtn0SgOL7sW6dvLU0tqnYrTzFTQ11YFsY_qPTVVHoyMjiJrmyDzgOo8LHw=s4800-w1080'),
+  ('mahabalipuram', 'https://lh3.googleusercontent.com/place-photos/AJRVUZNq5n8S3WYy3N3Li9xVQS4kz6w31uJwwrsRPtgK7SeWEwt-kpQS6wwoZGaggPso43iEfatQ-UuMRTsqtEOtmxCo1OiPuMzFSzggNtOnPzpCRP-soFHvVJlenA_xj01HJLdErq2wTXKMATfdvA=s4800-w1600'),
+  ('srirangam', 'https://lh3.googleusercontent.com/place-photos/AJRVUZOH549j9vtr3WT8Qc5HS9A1Vm0znZg6BfeNMJ3HmSOiOPyn9Ots9Ub2kyMrldOFXb5fFzv9ROa890ZB8HdD1b0K69T0E5NP27OoVpVhNCeGlTlt7SpuJu5zMLkDIIXuCXc2HFykyA_y4Ohh=s4800-w1600'),
+  ('srisailam', 'https://lh3.googleusercontent.com/place-photos/AJRVUZM89teOAgoLN-gQGorUfhsDR6lrgcKJGmwA9HU7-j9zr_YiBwJyC2MAKIrh8fdprraLuH3AHUDrlVrrvsmxbbx5nlGYLMOgYSyVlKM_C6KXXU3EpT_kFHkUthDl1QhlYln-7Rz9NOaQqTiTL9FntXFH=s4800-w842'),
+  ('thiruchendur-murugan', 'https://lh3.googleusercontent.com/place-photos/AJRVUZONPSfoCPkHnNb-hVpRMbD5bVZ5aRby3xKWW-gbd9DrG_l_TF46MuZaM-bEf1tWNHSyiGYvO4vralmkH1D52vIAJgJ3vBpbvmhjSTh2_clAffMs9k53vxW2HSSh_cSqQZ0Ym0AsLBaCVNctQhyE26bRwg=s4800-w1600'),
+  ('tirupati', 'https://lh3.googleusercontent.com/place-photos/AJRVUZO6rT-WAGCFInMV1BjXwgo681gE8Bn4_CBf0swt175dfBRH5DexzTZfzMKmZ72_TjEnvdJW6Qrj-2eG54tvZhmXugnW6Rdoaw9vRGuR_Q3Kp0pNvLBgLLJcj64gnbTmiiHZyIjqpPzbHEcW6DI=s4800-w1280'),
+  ('velliangiri', 'https://lh3.googleusercontent.com/place-photos/AJRVUZOWVnMKQPbAWegyUyLud1F-DGy3V5bk2NrzXQG5X91-0Lmk0VJ6gkKlJ1PcsnlbMvl4mG_RbSJePWu1dMesIdislCS0hx4SUEFzZT7VkuQvtbDPWJJj98yGSLOYpWAAUNTnHQ_jPipu-UNGJKDQ8ufrag=s4800-w718')
+) AS v(slug, url)
+WHERE t.slug = v.slug;
