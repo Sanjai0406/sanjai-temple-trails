@@ -56,6 +56,25 @@ function TempleDetail() {
     onError: (e: Error) => toast.error(e.message),
   });
 
+  const { data: nearby } = useQuery({
+    queryKey: ["nearby", slug],
+    queryFn: () => nearbyTemples({ data: { slug, limit: 6 } }),
+    enabled: !!t,
+  });
+
+  const onShare = async () => {
+    const url = typeof window !== "undefined" ? window.location.href : "";
+    const shareData = { title: t?.name ?? "Sanjai's Travel AI", text: `Discover ${t?.name} on Sanjai's Travel AI`, url };
+    try {
+      if (typeof navigator !== "undefined" && "share" in navigator) {
+        await navigator.share(shareData);
+      } else {
+        await navigator.clipboard.writeText(url);
+        toast.success("Link copied to clipboard 🔗");
+      }
+    } catch { /* user cancelled */ }
+  };
+
   if (!t) return null;
   const lat = Number(t.latitude ?? 13.0827);
   const lng = Number(t.longitude ?? 80.2707);
