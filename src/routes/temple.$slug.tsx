@@ -45,6 +45,16 @@ function TempleDetail() {
     onSuccess: () => { toast.success("Marked as visited ✅"); qc.invalidateQueries({ queryKey: ["visited"] }); },
     onError: (e: Error) => toast.error(e.message),
   });
+  const refreshMut = useMutation({
+    mutationFn: () => refreshTemplePhoto({ data: { slug } }),
+    onSuccess: () => {
+      toast.success("Photo refreshed from Google 📸");
+      qc.invalidateQueries({ queryKey: ["temple", slug] });
+      qc.invalidateQueries({ queryKey: ["temples"] });
+      qc.invalidateQueries({ queryKey: ["featured"] });
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
 
   if (!t) return null;
   const lat = Number(t.latitude ?? 13.0827);
