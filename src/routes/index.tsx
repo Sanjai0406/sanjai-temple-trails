@@ -60,8 +60,18 @@ function HomePage() {
         <div className="absolute inset-0">
           <img src={heroImg} alt="Temple at dawn" width={1920} height={1280} className="size-full object-cover" />
           <div className="absolute inset-0 bg-gradient-to-b from-temple/40 via-temple/60 to-background" />
+          {/* Floating diyas */}
+          <div className="absolute inset-0 overflow-hidden pointer-events-none">
+            {diyas.map((d, i) => (
+              <span
+                key={i}
+                className="diya"
+                style={{ left: d.left, width: d.size, height: d.size, animationDelay: d.delay, animationDuration: d.duration }}
+              />
+            ))}
+          </div>
         </div>
-        <div className="relative mx-auto max-w-7xl px-4 pt-16 pb-24 sm:pt-24 sm:pb-32 text-primary-foreground">
+        <div className="relative mx-auto max-w-7xl px-4 pt-16 pb-24 sm:pt-24 sm:pb-32 text-primary-foreground animate-fade-up">
           <div className="text-sm font-medium opacity-90">Vanakkam, {name} 🙏</div>
           <h1 className="font-display text-4xl sm:text-6xl font-bold leading-[1.05] mt-2 max-w-3xl">
             Your spiritual<br /> journey across <span className="text-gold">Bharat</span> begins here.
