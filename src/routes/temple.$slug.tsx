@@ -115,15 +115,19 @@ function TempleDetail() {
               {t.deity && <div className="text-primary mt-1">{t.deity}</div>}
               <div className="text-sm text-muted-foreground mt-1 flex items-center gap-1"><MapPin className="size-3" />{t.city}, {t.state}</div>
             </div>
-            <div className="flex gap-2">
+            <div className="flex gap-2 flex-wrap">
               <button
                 onClick={() => authed ? wishMut.mutate() : toast.info("Sign in to save")}
-                className="px-4 py-2 rounded-xl border border-border bg-card hover:bg-accent text-sm font-medium inline-flex items-center gap-1"
+                className="px-4 py-2 rounded-xl border border-border bg-card hover:bg-accent text-sm font-medium inline-flex items-center gap-1 transition hover:-translate-y-0.5"
               ><Heart className="size-4 text-primary" /> Wishlist</button>
               <button
                 onClick={() => authed ? visitMut.mutate() : toast.info("Sign in to save")}
-                className="px-4 py-2 rounded-xl gradient-hero text-primary-foreground text-sm font-medium inline-flex items-center gap-1"
+                className="px-4 py-2 rounded-xl gradient-hero text-primary-foreground text-sm font-medium inline-flex items-center gap-1 transition hover:-translate-y-0.5 animate-gold-glow"
               ><CheckCircle2 className="size-4" /> Visited</button>
+              <button
+                onClick={onShare}
+                className="px-4 py-2 rounded-xl border border-border bg-card hover:bg-accent text-sm font-medium inline-flex items-center gap-1 transition hover:-translate-y-0.5"
+              ><Share2 className="size-4" /> Share</button>
             </div>
           </div>
 
