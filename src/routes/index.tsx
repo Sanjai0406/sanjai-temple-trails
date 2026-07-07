@@ -24,8 +24,16 @@ const QUICK = [
   { to: "/chat", label: "AI Chat", icon: MessageCircle, hint: "Temple Explorer" },
 ];
 
+const MONTH_LABEL = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+const SEASON_ICON = ["❄️","❄️","🌸","🌸","☀️","🌧️","🌧️","🌧️","🍃","🍂","🪔","🪔"];
+
 function HomePage() {
   const { data: temples } = useQuery({ queryKey: ["featured"], queryFn: () => featuredTemples() });
+  const month = new Date().getMonth();
+  const { data: monthly } = useQuery({
+    queryKey: ["monthPicks", month],
+    queryFn: () => monthPicks({ data: { month, limit: 12 } }),
+  });
   const [name, setName] = useState("Sanjai");
   const navigate = useNavigate();
   const [q, setQ] = useState("");
@@ -38,6 +46,12 @@ function HomePage() {
   }, []);
 
   const today = temples?.[0];
+  const diyas = useMemo(() => Array.from({ length: 14 }, (_, i) => ({
+    left: `${(i * 7 + 5) % 95}%`,
+    delay: `${(i * 0.8) % 12}s`,
+    duration: `${10 + (i % 5) * 2}s`,
+    size: 4 + (i % 4),
+  })), []);
 
   return (
     <div>
