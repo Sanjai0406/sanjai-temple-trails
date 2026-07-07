@@ -1,10 +1,10 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { useEffect, useState } from "react";
-import { ArrowRight, Compass, MessageCircle, MapPin, Heart, CheckCircle2, Sun, Calendar } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
+import { ArrowRight, Compass, MessageCircle, MapPin, Heart, CheckCircle2, Sun, Calendar, Sparkles } from "lucide-react";
 import heroImg from "@/assets/hero-temple.jpg";
 import { supabase } from "@/integrations/supabase/client";
-import { featuredTemples } from "@/lib/temples.functions";
+import { featuredTemples, monthPicks } from "@/lib/temples.functions";
 import { TempleCard } from "@/components/TempleCard";
 import { WeatherWidget } from "@/components/WeatherWidget";
 
