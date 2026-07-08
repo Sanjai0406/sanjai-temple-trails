@@ -229,3 +229,15 @@
   animation-delay: 0ms !important;
 }
 .motion-low .animate-fade-up { animation-duration: 300ms !important; }
+.motion-low .animate-fade-in { animation-duration: 250ms !important; }
+/* Tame long image/hover transitions and hover zoom under low motion. */
+.motion-low .group img,
+.motion-low img {
+  transition-duration: 200ms !important;
+}
+.motion-low .group:hover img {
+  transform: none !important;
+}
+.motion-low [class*="hover:scale-"]:hover {
+  transform: none !important;
+}
