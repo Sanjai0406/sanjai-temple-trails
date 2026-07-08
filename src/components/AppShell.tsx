@@ -2,6 +2,7 @@ import { Link, useRouter, useRouterState } from "@tanstack/react-router";
 import { useEffect, useState, type ReactNode } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Home, Compass, MessageCircle, MapPin, Heart, CheckCircle2, User, Sparkles, Menu, X } from "lucide-react";
+import { applyMotionIntensity, readMotionIntensity } from "@/lib/motion";
 
 const NAV = [
   { to: "/", label: "Home", icon: Home },
