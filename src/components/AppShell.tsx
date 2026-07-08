@@ -22,6 +22,10 @@ export function AppShell({ children }: { children: ReactNode }) {
   const [open, setOpen] = useState(false);
 
   useEffect(() => {
+    applyMotionIntensity(readMotionIntensity());
+  }, []);
+
+  useEffect(() => {
     supabase.auth.getUser().then(({ data }) => {
       setAuthed(!!data.user);
       setName(data.user?.user_metadata?.full_name ?? data.user?.email?.split("@")[0] ?? "");
