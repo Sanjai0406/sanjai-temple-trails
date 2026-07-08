@@ -4,7 +4,8 @@ import { getProfile, updateProfile, getTravelStats } from "@/lib/profile.functio
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { User, MapPin, Heart, CheckCircle2, Compass } from "lucide-react";
+import { User, MapPin, Heart, CheckCircle2, Compass, Sparkles } from "lucide-react";
+import { useMotionIntensity, type MotionIntensity } from "@/lib/motion";
 
 export const Route = createFileRoute("/profile")({
   head: () => ({ meta: [{ title: "Profile · Sanjai's Travel AI" }] }),
