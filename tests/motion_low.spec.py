@@ -39,6 +39,7 @@ async def main():
         # --- Toggle to Low via the same localStorage key the app uses ---
         await page.evaluate("localStorage.setItem('motion-intensity','low')")
         await page.reload(wait_until="domcontentloaded")
+        await page.wait_for_function("document.documentElement.classList.contains('motion-low')")
 
         html_class_low = await page.evaluate("document.documentElement.className")
         check("motion-low" in html_class_low, "html gains .motion-low after toggle")
