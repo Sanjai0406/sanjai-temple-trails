@@ -216,3 +216,16 @@
     opacity: 1 !important;
   }
 }
+
+/* Low-intensity mode: keep short fades, disable ambient/looping motion. */
+.motion-low .diya { display: none !important; }
+.motion-low .animate-gold-glow,
+.motion-low .animate-marquee,
+.motion-low .shimmer {
+  animation: none !important;
+}
+.motion-low .stagger > * {
+  animation-duration: 300ms !important;
+  animation-delay: 0ms !important;
+}
+.motion-low .animate-fade-up { animation-duration: 300ms !important; }
