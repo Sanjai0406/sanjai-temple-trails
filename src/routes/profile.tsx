@@ -90,6 +90,46 @@ function ProfilePage() {
         </div>
         <button onClick={() => save.mutate()} disabled={save.isPending} className="h-11 px-5 rounded-xl gradient-hero text-primary-foreground font-semibold disabled:opacity-50">Save preferences</button>
       </div>
+
+      <MotionSettings />
+    </div>
+  );
+}
+
+function MotionSettings() {
+  const [intensity, setIntensity] = useMotionIntensity();
+  const options: { value: MotionIntensity; label: string; hint: string }[] = [
+    { value: "standard", label: "Standard", hint: "Floating diyas, shimmer, marquee" },
+    { value: "low", label: "Low", hint: "Only essential fades, no ambient loops" },
+  ];
+  return (
+    <div className="temple-card p-5 mt-6">
+      <div className="flex items-center gap-2 mb-1">
+        <Sparkles className="size-4 text-primary" />
+        <h2 className="font-display text-lg font-semibold">Animation intensity</h2>
+      </div>
+      <p className="text-xs text-muted-foreground mb-3">
+        System <em>prefers-reduced-motion</em> is always respected and overrides this setting.
+      </p>
+      <div className="grid sm:grid-cols-2 gap-2">
+        {options.map((o) => {
+          const active = intensity === o.value;
+          return (
+            <button
+              key={o.value}
+              type="button"
+              onClick={() => setIntensity(o.value)}
+              className={`text-left p-3 rounded-xl border transition ${
+                active ? "border-primary bg-accent/60" : "border-border hover:bg-accent/30"
+              }`}
+              aria-pressed={active}
+            >
+              <div className="text-sm font-semibold">{o.label}</div>
+              <div className="text-xs text-muted-foreground">{o.hint}</div>
+            </button>
+          );
+        })}
+      </div>
     </div>
   );
 }
