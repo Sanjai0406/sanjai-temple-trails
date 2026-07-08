@@ -2,6 +2,7 @@ import { Link, useRouter, useRouterState } from "@tanstack/react-router";
 import { useEffect, useState, type ReactNode } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Home, Compass, MessageCircle, MapPin, Heart, CheckCircle2, User, Sparkles, Menu, X } from "lucide-react";
+import { applyMotionIntensity, readMotionIntensity } from "@/lib/motion";
 
 const NAV = [
   { to: "/", label: "Home", icon: Home },
@@ -19,6 +20,10 @@ export function AppShell({ children }: { children: ReactNode }) {
   const [authed, setAuthed] = useState(false);
   const [name, setName] = useState<string>("");
   const [open, setOpen] = useState(false);
+
+  useEffect(() => {
+    applyMotionIntensity(readMotionIntensity());
+  }, []);
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data }) => {
