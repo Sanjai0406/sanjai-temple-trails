@@ -68,12 +68,14 @@ async def main():
 
         # --- Temple detail: gold-glow CTA must not animate under motion-low ---
         await page.goto(f"{BASE}/temple/{TEMPLE_SLUG}", wait_until="domcontentloaded")
+        await page.wait_for_function("document.documentElement.classList.contains('motion-low')")
         await page.wait_for_selector(".animate-gold-glow")
-        glow_anim = await page.evaluate(
+        glow = await page.evaluate(
             "(() => { const g=document.querySelector('.animate-gold-glow');"
-            "return g ? getComputedStyle(g).animationName : 'missing'; })()"
+            "return g ? { name: getComputedStyle(g).animationName, dur: getComputedStyle(g).animationDuration } : null; })()"
         )
-        check(glow_anim == "none", f"Gold-glow CTA animation disabled (animationName={glow_anim})")
+        check(bool(glow) and (glow["name"] == "none" or glow["dur"] in ("0s", "0ms")),
+              f"Gold-glow CTA animation disabled ({glow})")
 
         # hover:scale-* transforms must be neutralised on temple page images
         scale_transform = await page.evaluate("""(() => {
