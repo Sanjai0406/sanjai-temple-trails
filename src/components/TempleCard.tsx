@@ -1,5 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import { MapPin, Star } from "lucide-react";
+import { TempleImage } from "@/components/TempleImage";
 
 type Temple = {
   slug: string;
