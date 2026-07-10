@@ -182,7 +182,7 @@ function TempleDetail() {
                   className="temple-card hover:temple-card-hover overflow-hidden group flex"
                 >
                   <div className="relative w-24 sm:w-28 shrink-0 bg-muted">
-                    {n.hero_image && <img src={n.hero_image} alt={n.name} loading="lazy" className="size-full object-cover group-hover:scale-105 transition duration-500" />}
+                    <TempleImage slug={n.slug} src={n.hero_image} alt={n.name} loading="lazy" className="size-full object-cover group-hover:scale-105 transition duration-500" />
                   </div>
                   <div className="p-3 flex-1 min-w-0">
                     <div className="font-display font-semibold text-sm leading-tight line-clamp-1">{n.name}</div>
