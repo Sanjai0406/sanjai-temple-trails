@@ -39,6 +39,7 @@ async def check_page(context, url: str, tag: str):
             repair_calls.append(req.url)
     page.on("request", on_request)
 
+    start_ts["t"] = time.monotonic()
     await page.goto(url, wait_until="domcontentloaded")
     await page.wait_for_load_state("networkidle", timeout=15000)
     # give self-heal time to run and the swapped img to load
