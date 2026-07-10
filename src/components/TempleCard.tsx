@@ -23,16 +23,13 @@ export function TempleCard({ t }: { t: Temple }) {
       className="temple-card hover:temple-card-hover overflow-hidden group block"
     >
       <div className="relative aspect-[4/3] overflow-hidden bg-muted">
-        {t.hero_image ? (
-          <img
-            src={t.hero_image}
-            alt={t.name}
-            loading="lazy"
-            className="size-full object-cover transition-transform duration-500 group-hover:scale-105"
-          />
-        ) : (
-          <div className="size-full gradient-hero" />
-        )}
+        <TempleImage
+          slug={t.slug}
+          src={t.hero_image}
+          alt={t.name}
+          loading="lazy"
+          className="size-full object-cover transition-transform duration-500 group-hover:scale-105"
+        />
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
         <div className="absolute top-2 left-2 flex gap-1.5">
           {t.is_unesco && <span className="text-[10px] px-2 py-0.5 rounded-full bg-gold text-temple font-semibold">UNESCO</span>}
