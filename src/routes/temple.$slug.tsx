@@ -3,6 +3,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { getTemple, nearbyTemples } from "@/lib/temples.functions";
 import { addToWishlist, addVisited } from "@/lib/profile.functions";
 import { refreshTemplePhoto } from "@/lib/temple-photo.functions";
+import { TempleImage } from "@/components/TempleImage";
 import { WeatherWidget } from "@/components/WeatherWidget";
 import { MapEmbed } from "@/components/MapEmbed";
 import { ArrowLeft, Heart, CheckCircle2, MapPin, Clock, Shirt, Star, IndianRupee, RefreshCw, Share2, Navigation } from "lucide-react";
@@ -84,7 +85,7 @@ function TempleDetail() {
   return (
     <div>
       <div className="relative aspect-[16/8] sm:aspect-[16/6] overflow-hidden">
-        {t.hero_image && <img src={t.hero_image} alt={t.name} className="size-full object-cover" />}
+        <TempleImage slug={t.slug} src={t.hero_image} alt={t.name} loading="eager" className="size-full object-cover" />
         <div className="absolute inset-0 bg-gradient-to-t from-background via-background/30 to-temple/40" />
         <div className="absolute inset-x-0 top-0 p-4 flex items-center justify-between">
           <Link to="/explore" className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full bg-white/20 backdrop-blur text-white text-sm">
@@ -181,7 +182,7 @@ function TempleDetail() {
                   className="temple-card hover:temple-card-hover overflow-hidden group flex"
                 >
                   <div className="relative w-24 sm:w-28 shrink-0 bg-muted">
-                    {n.hero_image && <img src={n.hero_image} alt={n.name} loading="lazy" className="size-full object-cover group-hover:scale-105 transition duration-500" />}
+                    <TempleImage slug={n.slug} src={n.hero_image} alt={n.name} loading="lazy" className="size-full object-cover group-hover:scale-105 transition duration-500" />
                   </div>
                   <div className="p-3 flex-1 min-w-0">
                     <div className="font-display font-semibold text-sm leading-tight line-clamp-1">{n.name}</div>
