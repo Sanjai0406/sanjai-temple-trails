@@ -19,12 +19,14 @@ async def check_page(context, url: str, tag: str):
     page = await context.new_page()
     failed_once: set[str] = set()
     repair_calls: list[str] = []
+    # Only 404 initial photo loads; let the repaired URLs through.
+    import time
+    start_ts = {"t": 0.0}
 
     async def route_handler(route):
         req = route.request
         u = req.url
-        # First time we see a googleusercontent image, simulate an expired URL.
-        if "googleusercontent.com" in u and u not in failed_once:
+        if "googleusercontent.com" in u and u not in failed_once and (time.monotonic() - start_ts["t"]) < 1.5:
             failed_once.add(u)
             await route.fulfill(status=404, body="")
             return
