@@ -3,6 +3,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { getTemple, nearbyTemples } from "@/lib/temples.functions";
 import { addToWishlist, addVisited } from "@/lib/profile.functions";
 import { refreshTemplePhoto } from "@/lib/temple-photo.functions";
+import { TempleImage } from "@/components/TempleImage";
 import { WeatherWidget } from "@/components/WeatherWidget";
 import { MapEmbed } from "@/components/MapEmbed";
 import { ArrowLeft, Heart, CheckCircle2, MapPin, Clock, Shirt, Star, IndianRupee, RefreshCw, Share2, Navigation } from "lucide-react";
