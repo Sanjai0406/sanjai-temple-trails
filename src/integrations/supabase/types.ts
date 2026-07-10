@@ -139,6 +139,7 @@ export type Database = {
           estimated_budget: number | null
           festivals: string[] | null
           gallery: string[] | null
+          google_photo_ref: string | null
           hero_image: string | null
           history: string | null
           id: string
@@ -170,6 +171,7 @@ export type Database = {
           estimated_budget?: number | null
           festivals?: string[] | null
           gallery?: string[] | null
+          google_photo_ref?: string | null
           hero_image?: string | null
           history?: string | null
           id?: string
@@ -201,6 +203,7 @@ export type Database = {
           estimated_budget?: number | null
           festivals?: string[] | null
           gallery?: string[] | null
+          google_photo_ref?: string | null
           hero_image?: string | null
           history?: string | null
           id?: string

@@ -1,0 +1,1 @@
+ALTER TABLE public.temples ADD COLUMN IF NOT EXISTS google_photo_ref text;
