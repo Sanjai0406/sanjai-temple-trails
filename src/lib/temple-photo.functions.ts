@@ -54,6 +54,31 @@ function serverAnonClient() {
  * Re-searches Google Places for the best photo and stores both the resource
  * name (stable) and a fresh photoUri (fast direct URL).
  */
+async function logRepair(
+  templeId: string,
+  row: {
+    source: "cached_ref" | "search" | "manual_refresh";
+    success: boolean;
+    photo_uri?: string | null;
+    error_message?: string | null;
+    triggered_by: "auto" | "manual";
+  },
+) {
+  try {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    await supabaseAdmin.from("temple_photo_repairs").insert({
+      temple_id: templeId,
+      source: row.source,
+      success: row.success,
+      photo_uri: row.photo_uri ?? null,
+      error_message: row.error_message ?? null,
+      triggered_by: row.triggered_by,
+    });
+  } catch {
+    // Logging must never break the primary repair flow.
+  }
+}
+
 export const refreshTemplePhoto = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: { slug: string }) => {
@@ -74,20 +99,37 @@ export const refreshTemplePhoto = createServerFn({ method: "POST" })
     if (!t) throw new Error("Temple not found");
 
     const query = [t.name, t.deity, t.city, t.state].filter(Boolean).join(" ");
-    const photoName = await findPhotoName(query, lovableKey, gmapsKey);
-    if (!photoName) throw new Error("No photos available on Google Places for this destination");
+    try {
+      const photoName = await findPhotoName(query, lovableKey, gmapsKey);
+      if (!photoName) throw new Error("No photos available on Google Places for this destination");
 
-    const uri = await resolvePhotoUri(photoName, lovableKey, gmapsKey);
-    if (!uri) throw new Error("Google did not return a photo URL");
+      const uri = await resolvePhotoUri(photoName, lovableKey, gmapsKey);
+      if (!uri) throw new Error("Google did not return a photo URL");
 
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { error: upErr } = await supabaseAdmin
-      .from("temples")
-      .update({ hero_image: uri, google_photo_ref: photoName })
-      .eq("id", t.id);
-    if (upErr) throw new Error(upErr.message);
+      const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+      const { error: upErr } = await supabaseAdmin
+        .from("temples")
+        .update({ hero_image: uri, google_photo_ref: photoName })
+        .eq("id", t.id);
+      if (upErr) throw new Error(upErr.message);
 
-    return { hero_image: uri, google_photo_ref: photoName };
+      await logRepair(t.id, {
+        source: "manual_refresh",
+        success: true,
+        photo_uri: uri,
+        triggered_by: "manual",
+      });
+
+      return { hero_image: uri, google_photo_ref: photoName };
+    } catch (err) {
+      await logRepair(t.id, {
+        source: "manual_refresh",
+        success: false,
+        error_message: err instanceof Error ? err.message : String(err),
+        triggered_by: "manual",
+      });
+      throw err;
+    }
   });
 
 /**
