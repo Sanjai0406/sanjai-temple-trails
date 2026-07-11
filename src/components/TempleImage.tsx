@@ -37,26 +37,28 @@ export function TempleImage({ slug, src, alt, className, loading = "lazy" }: Pro
     repairedRef.current = false;
   }, [src, slug]);
 
-  const runRepair = async (isManual = false) => {
+  const runRepair = async (isManual: boolean) => {
     if (status === "healing") return;
     repairedRef.current = true;
     setStatus("healing");
     try {
-      const res = await repair({ data: { slug } });
+      const res = await repair({
+        data: { slug, triggered_by: isManual ? "manual" : "auto" },
+      });
       if (res?.hero_image) {
         setCurrent(res.hero_image);
         setStatus("healed");
         qc.invalidateQueries({ queryKey: ["temple", slug] });
         qc.invalidateQueries({ queryKey: ["featured"] });
         qc.invalidateQueries({ queryKey: ["temples"] });
+        qc.invalidateQueries({ queryKey: ["photo-repairs", slug] });
       } else {
         setStatus("failed");
       }
     } catch {
       setStatus("failed");
+      qc.invalidateQueries({ queryKey: ["photo-repairs", slug] });
     }
-    // Silence unused var lint if isManual is not used further
-    void isManual;
   };
 
   const onError = () => {
