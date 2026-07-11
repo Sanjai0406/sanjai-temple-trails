@@ -167,6 +167,10 @@ function TempleDetail() {
           <WeatherWidget lat={lat} lng={lng} place={t.city ?? t.state} />
         </div>
 
+        <TemplePhotoRepairLog slug={t.slug} />
+
+
+
         {/* NEARBY DESTINATIONS */}
         {nearby && nearby.length > 0 && (
           <div className="mt-8 mb-12">
