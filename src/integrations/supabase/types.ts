@@ -125,6 +125,47 @@ export type Database = {
         }
         Relationships: []
       }
+      temple_photo_repairs: {
+        Row: {
+          created_at: string
+          error_message: string | null
+          id: string
+          photo_uri: string | null
+          source: string
+          success: boolean
+          temple_id: string
+          triggered_by: string
+        }
+        Insert: {
+          created_at?: string
+          error_message?: string | null
+          id?: string
+          photo_uri?: string | null
+          source: string
+          success: boolean
+          temple_id: string
+          triggered_by?: string
+        }
+        Update: {
+          created_at?: string
+          error_message?: string | null
+          id?: string
+          photo_uri?: string | null
+          source?: string
+          success?: boolean
+          temple_id?: string
+          triggered_by?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "temple_photo_repairs_temple_id_fkey"
+            columns: ["temple_id"]
+            isOneToOne: false
+            referencedRelation: "temples"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       temples: {
         Row: {
           architecture: string | null
