@@ -140,9 +140,12 @@ export const refreshTemplePhoto = createServerFn({ method: "POST" })
  * URL for a public row.
  */
 export const repairTemplePhoto = createServerFn({ method: "POST" })
-  .inputValidator((input: { slug: string }) => {
+  .inputValidator((input: { slug: string; triggered_by?: "auto" | "manual" }) => {
     if (!input?.slug || typeof input.slug !== "string") throw new Error("slug required");
-    return { slug: input.slug.slice(0, 120) };
+    return {
+      slug: input.slug.slice(0, 120),
+      triggered_by: input.triggered_by === "manual" ? "manual" : "auto",
+    } as const;
   })
   .handler(async ({ data }) => {
     const lovableKey = process.env.LOVABLE_API_KEY;
@@ -158,22 +161,71 @@ export const repairTemplePhoto = createServerFn({ method: "POST" })
     if (!t) throw new Error("Temple not found");
 
     let photoName = t.google_photo_ref;
-    if (!photoName) {
-      const query = [t.name, t.deity, t.city, t.state].filter(Boolean).join(" ");
-      photoName = await findPhotoName(query, lovableKey, gmapsKey);
+    let source: "cached_ref" | "search" = photoName ? "cached_ref" : "search";
+    try {
+      if (!photoName) {
+        const query = [t.name, t.deity, t.city, t.state].filter(Boolean).join(" ");
+        photoName = await findPhotoName(query, lovableKey, gmapsKey);
+        source = "search";
+      }
+      if (!photoName) throw new Error("No photo available");
+
+      const uri = await resolvePhotoUri(photoName, lovableKey, gmapsKey);
+      if (!uri) throw new Error("Could not resolve photo URL");
+
+      const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+      await supabaseAdmin
+        .from("temples")
+        .update({ hero_image: uri, google_photo_ref: photoName })
+        .eq("id", t.id);
+
+      await logRepair(t.id, {
+        source,
+        success: true,
+        photo_uri: uri,
+        triggered_by: data.triggered_by,
+      });
+
+      return { hero_image: uri };
+    } catch (err) {
+      await logRepair(t.id, {
+        source,
+        success: false,
+        error_message: err instanceof Error ? err.message : String(err),
+        triggered_by: data.triggered_by,
+      });
+      throw err;
     }
-    if (!photoName) throw new Error("No photo available");
-
-    const uri = await resolvePhotoUri(photoName, lovableKey, gmapsKey);
-    if (!uri) throw new Error("Could not resolve photo URL");
-
-    // Persist the fresh URL (and ref, if newly discovered) so every other
-    // viewer gets the healed image without hitting Google again.
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    await supabaseAdmin
-      .from("temples")
-      .update({ hero_image: uri, google_photo_ref: photoName })
-      .eq("id", t.id);
-
-    return { hero_image: uri };
   });
+
+/** Public: list recent photo-repair log entries for a temple. */
+export const listTemplePhotoRepairs = createServerFn({ method: "GET" })
+  .inputValidator((input: { slug: string; limit?: number }) => {
+    if (!input?.slug || typeof input.slug !== "string") throw new Error("slug required");
+    const limit = Math.max(1, Math.min(50, Number(input.limit) || 10));
+    return { slug: input.slug.slice(0, 120), limit };
+  })
+  .handler(async ({ data }) => {
+    const sb = serverAnonClient();
+    const { data: t } = await sb
+      .from("temples")
+      .select("id")
+      .eq("slug", data.slug)
+      .maybeSingle();
+    if (!t) return { logs: [], total: 0 };
+
+    const { data: rows } = await sb
+      .from("temple_photo_repairs")
+      .select("id, created_at, source, success, photo_uri, error_message, triggered_by")
+      .eq("temple_id", t.id)
+      .order("created_at", { ascending: false })
+      .limit(data.limit);
+
+    const { count } = await sb
+      .from("temple_photo_repairs")
+      .select("id", { count: "exact", head: true })
+      .eq("temple_id", t.id);
+
+    return { logs: rows ?? [], total: count ?? (rows?.length ?? 0) };
+  });
+
