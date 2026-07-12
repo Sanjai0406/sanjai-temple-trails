@@ -35,6 +35,37 @@ export function TemplePhotoRepairLog({ slug, compact = false }: Props) {
   const failures = logs.length - successes;
   const lastHealed = logs.find((l) => l.success);
 
+  if (compact) {
+    // Hide entirely when there's nothing to report — keeps the card grid tidy.
+    if (isLoading || total === 0) return null;
+    return (
+      <div className="mt-1.5 px-3.5 pb-3 -mt-1">
+        <div className="rounded-lg border border-border/60 bg-muted/30 px-2.5 py-1.5 text-[11px] flex items-center flex-wrap gap-x-2 gap-y-0.5">
+          <span className="inline-flex items-center gap-1 font-medium text-foreground">
+            <Sparkles className="size-3 text-primary" />
+            {total} repair{total === 1 ? "" : "s"}
+          </span>
+          <span className="inline-flex items-center gap-1 text-emerald-600">
+            <CheckCircle2 className="size-3" />
+            {successes}
+          </span>
+          {failures > 0 && (
+            <span className="inline-flex items-center gap-1 text-destructive">
+              <XCircle className="size-3" />
+              {failures}
+            </span>
+          )}
+          {lastHealed && (
+            <span className="text-muted-foreground ml-auto">
+              healed <span className="text-foreground font-medium">{timeAgo(lastHealed.created_at)}</span>
+            </span>
+          )}
+        </div>
+      </div>
+    );
+  }
+
+
   return (
     <div className="temple-card p-4 mt-6">
       <div className="flex items-center justify-between gap-2 mb-3">
