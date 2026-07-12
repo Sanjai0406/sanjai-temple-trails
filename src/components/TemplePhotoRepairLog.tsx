@@ -22,7 +22,7 @@ function timeAgo(iso: string) {
   return `${d}d ago`;
 }
 
-export function TemplePhotoRepairLog({ slug }: Props) {
+export function TemplePhotoRepairLog({ slug, compact = false }: Props) {
   const { data, isLoading } = useQuery({
     queryKey: ["photo-repairs", slug],
     queryFn: () => listTemplePhotoRepairs({ data: { slug, limit: 10 } }),
