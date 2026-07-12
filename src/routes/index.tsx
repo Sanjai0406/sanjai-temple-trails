@@ -206,7 +206,7 @@ function HomePage() {
           <Link to="/explore" className="text-sm text-primary font-medium">View all →</Link>
         </div>
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 stagger">
-          {temples?.slice(0, 8).map((t) => <TempleCard key={t.slug} t={t} />)}
+          {temples?.slice(0, 8).map((t) => <TempleCard key={t.slug} t={t} showRepairLog />)}
         </div>
       </section>
 
