@@ -214,14 +214,19 @@ export const listTemplePhotoRepairs = createServerFn({ method: "GET" })
       .maybeSingle();
     if (!t) return { logs: [], total: 0 };
 
-    const { data: rows } = await sb
+    // Repair logs contain internal error messages / source metadata, so they
+    // are not exposed via RLS to anon. Read them server-side with the admin
+    // client and return only the fields the UI needs.
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+
+    const { data: rows } = await supabaseAdmin
       .from("temple_photo_repairs")
       .select("id, created_at, source, success, photo_uri, error_message, triggered_by")
       .eq("temple_id", t.id)
       .order("created_at", { ascending: false })
       .limit(data.limit);
 
-    const { count } = await sb
+    const { count } = await supabaseAdmin
       .from("temple_photo_repairs")
       .select("id", { count: "exact", head: true })
       .eq("temple_id", t.id);
