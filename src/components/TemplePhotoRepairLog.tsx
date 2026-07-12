@@ -2,7 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { CheckCircle2, XCircle, Database, Search, RefreshCw, History, User, Sparkles } from "lucide-react";
 import { listTemplePhotoRepairs } from "@/lib/temple-photo.functions";
 
-type Props = { slug: string };
+type Props = { slug: string; compact?: boolean };
 
 const SOURCE_META: Record<string, { label: string; icon: typeof Database }> = {
   cached_ref: { label: "Cached Google reference", icon: Database },
