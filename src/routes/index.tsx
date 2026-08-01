@@ -35,6 +35,8 @@ function HomePage() {
     queryFn: () => monthPicks({ data: { month, limit: 12 } }),
   });
   const [name, setName] = useState("Sanjai");
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
   const navigate = useNavigate();
   const [q, setQ] = useState("");
 
@@ -147,7 +149,7 @@ function HomePage() {
       )}
 
       {/* PERFECT FOR THIS MONTH — horizontal season-aware rail */}
-      {monthly && monthly.length > 0 && (
+      {mounted && monthly && monthly.length > 0 && (
         <section className="mx-auto max-w-7xl px-4 mt-14">
           <div className="flex items-end justify-between mb-4">
             <div>
