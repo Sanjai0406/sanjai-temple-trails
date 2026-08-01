@@ -35,6 +35,8 @@ function HomePage() {
     queryFn: () => monthPicks({ data: { month, limit: 12 } }),
   });
   const [name, setName] = useState("Sanjai");
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
   const navigate = useNavigate();
   const [q, setQ] = useState("");
 
