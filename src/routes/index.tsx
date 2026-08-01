@@ -149,7 +149,7 @@ function HomePage() {
       )}
 
       {/* PERFECT FOR THIS MONTH — horizontal season-aware rail */}
-      {monthly && monthly.length > 0 && (
+      {mounted && monthly && monthly.length > 0 && (
         <section className="mx-auto max-w-7xl px-4 mt-14">
           <div className="flex items-end justify-between mb-4">
             <div>
