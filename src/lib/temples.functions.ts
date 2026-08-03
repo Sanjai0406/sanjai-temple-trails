@@ -72,12 +72,30 @@ export const getTemple = createServerFn({ method: "GET" })
     return row;
   });
 
+/** Distinct states + budget range, for building the Explore filter controls. */
+export const placeFilterOptions = createServerFn({ method: "GET" }).handler(async () => {
+  const sb = publicClient();
+  const { data } = await sb.from("temples").select("state, estimated_budget, is_hidden_gem").limit(2000);
+  const rows = data ?? [];
+  const states = Array.from(new Set(rows.map((r) => r.state).filter(Boolean))).sort();
+  const budgets = rows.map((r) => r.estimated_budget).filter((b): b is number => typeof b === "number");
+  return {
+    states,
+    hiddenGems: rows.filter((r) => r.is_hidden_gem).length,
+    total: rows.length,
+    budgetMin: budgets.length ? Math.min(...budgets) : 0,
+    budgetMax: budgets.length ? Math.max(...budgets) : 0,
+  };
+});
+
 export const featuredTemples = createServerFn({ method: "GET" }).handler(async () => {
   const sb = publicClient();
   const { data } = await sb
     .from("temples")
     .select("id,slug,name,city,state,category,hero_image,rating,is_unesco,is_hidden_gem,deity")
     .order("rating", { ascending: false })
+    .order("slug", { ascending: true })
+
     .limit(8);
   return data ?? [];
 });
