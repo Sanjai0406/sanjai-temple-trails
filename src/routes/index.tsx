@@ -127,8 +127,9 @@ function HomePage() {
       </section>
 
       {/* TODAY'S SUGGESTION */}
-      {today && (
-        <section className="mx-auto max-w-7xl px-4 mt-12">
+      <section className="mx-auto max-w-7xl px-4 mt-12">
+        {today && (
+          <>
           <div className="text-xs uppercase tracking-wider text-muted-foreground">Today's suggestion</div>
           <Link
             to="/temple/$slug"
@@ -145,11 +146,13 @@ function HomePage() {
               <div className="mt-4 inline-flex items-center gap-1 text-primary font-medium text-sm">Read story <ArrowRight className="size-4" /></div>
             </div>
           </Link>
-        </section>
-      )}
+          </>
+        )}
+      </section>
 
       {/* PERFECT FOR THIS MONTH — horizontal season-aware rail */}
       {mounted && monthly && monthly.length > 0 && (
+
         <section className="mx-auto max-w-7xl px-4 mt-14">
           <div className="flex items-end justify-between mb-4">
             <div>
