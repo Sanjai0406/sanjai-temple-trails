@@ -8,18 +8,60 @@ function publicClient() {
   });
 }
 
+const MONTH_ABBR_ALL = ["jan","feb","mar","apr","may","jun","jul","aug","sep","oct","nov","dec"];
+const MONTH_FULL_ALL = ["january","february","march","april","may","june","july","august","september","october","november","december"];
+
+export type TempleFilters = {
+  category?: string;
+  state?: string;
+  states?: string[];
+  q?: string;
+  months?: number[];
+  budgetMin?: number;
+  budgetMax?: number;
+  hiddenOnly?: boolean;
+  sort?: "rating" | "budget_asc" | "budget_desc" | "name";
+  limit?: number;
+};
+
 export const listTemples = createServerFn({ method: "GET" })
-  .inputValidator((data: { category?: string; state?: string; q?: string; limit?: number } | undefined) => data ?? {})
+  .inputValidator((data: TempleFilters | undefined): TempleFilters => {
+    const d = data ?? {};
+    return {
+      ...d,
+      months: Array.isArray(d.months) ? d.months.filter((m) => m >= 0 && m <= 11) : undefined,
+      limit: Math.max(1, Math.min(300, Number(d.limit) || 120)),
+    };
+  })
   .handler(async ({ data }) => {
     const sb = publicClient();
-    let q = sb.from("temples").select("*").limit(data.limit ?? 60);
+    let q = sb.from("temples").select("*").limit(data.limit ?? 120);
     if (data.category && data.category !== "all") q = q.eq("category", data.category);
     if (data.state) q = q.eq("state", data.state);
-    if (data.q) q = q.or(`name.ilike.%${data.q}%,city.ilike.%${data.q}%,deity.ilike.%${data.q}%,district.ilike.%${data.q}%`);
+    if (data.states?.length) q = q.in("state", data.states);
+    if (data.hiddenOnly) q = q.eq("is_hidden_gem", true);
+    if (typeof data.budgetMin === "number") q = q.gte("estimated_budget", data.budgetMin);
+    if (typeof data.budgetMax === "number") q = q.lte("estimated_budget", data.budgetMax);
+    if (data.q) q = q.or(`name.ilike.%${data.q}%,city.ilike.%${data.q}%,deity.ilike.%${data.q}%,district.ilike.%${data.q}%,speciality.ilike.%${data.q}%,tags.cs.{${data.q.toLowerCase()}}`);
+    if (data.months?.length) {
+      const clauses = data.months.flatMap((m) => [
+        `best_time.ilike.%${MONTH_ABBR_ALL[m]}%`,
+        `best_time.ilike.%${MONTH_FULL_ALL[m]}%`,
+        "best_time.ilike.%year-round%",
+      ]);
+      q = q.or(clauses.join(","));
+    }
+    if (data.sort === "budget_asc") q = q.order("estimated_budget", { ascending: true, nullsFirst: false });
+    else if (data.sort === "budget_desc") q = q.order("estimated_budget", { ascending: false, nullsFirst: false });
+    else if (data.sort === "name") q = q.order("name", { ascending: true });
+    else q = q.order("rating", { ascending: false });
+    q = q.order("slug", { ascending: true });
+
     const { data: rows, error } = await q;
     if (error) throw new Error(error.message);
     return rows ?? [];
   });
+
 
 export const getTemple = createServerFn({ method: "GET" })
   .inputValidator((data: { slug: string }) => data)
@@ -30,12 +72,30 @@ export const getTemple = createServerFn({ method: "GET" })
     return row;
   });
 
+/** Distinct states + budget range, for building the Explore filter controls. */
+export const placeFilterOptions = createServerFn({ method: "GET" }).handler(async () => {
+  const sb = publicClient();
+  const { data } = await sb.from("temples").select("state, estimated_budget, is_hidden_gem").limit(2000);
+  const rows = data ?? [];
+  const states = Array.from(new Set(rows.map((r) => r.state).filter(Boolean))).sort();
+  const budgets = rows.map((r) => r.estimated_budget).filter((b): b is number => typeof b === "number");
+  return {
+    states,
+    hiddenGems: rows.filter((r) => r.is_hidden_gem).length,
+    total: rows.length,
+    budgetMin: budgets.length ? Math.min(...budgets) : 0,
+    budgetMax: budgets.length ? Math.max(...budgets) : 0,
+  };
+});
+
 export const featuredTemples = createServerFn({ method: "GET" }).handler(async () => {
   const sb = publicClient();
   const { data } = await sb
     .from("temples")
     .select("id,slug,name,city,state,category,hero_image,rating,is_unesco,is_hidden_gem,deity")
     .order("rating", { ascending: false })
+    .order("slug", { ascending: true })
+
     .limit(8);
   return data ?? [];
 });
