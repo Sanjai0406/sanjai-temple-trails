@@ -62,6 +62,7 @@ function Explore() {
   const budget = search.budget ?? "any";
   const hiddenOnly = search.hidden === true;
   const sort = (search.sort ?? "rating") as "rating" | "budget_asc" | "budget_desc" | "name";
+  const view = search.view === "map" ? "map" : "grid";
 
   const set = (patch: Partial<SearchParams>) =>
     navigate({ search: (s: SearchParams) => ({ ...s, ...patch }) });
