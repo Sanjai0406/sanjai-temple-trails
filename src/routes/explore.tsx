@@ -1,11 +1,11 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, ClientOnly, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { lazy, Suspense, useMemo, useState } from "react";
-import { ClientOnly } from "@tanstack/react-router";
+import { lazy, Suspense, useEffect, useMemo, useRef, useState } from "react";
 import { listTemples, placeFilterOptions } from "@/lib/temples.functions";
 import { TempleCard } from "@/components/TempleCard";
+import { TempleImage } from "@/components/TempleImage";
 import { CATEGORIES, REGIONS, SEASONS, BUDGET_BANDS } from "@/lib/constants";
-import { Search as SearchIcon, SlidersHorizontal, X, Gem, Map as MapIcon, LayoutGrid } from "lucide-react";
+import { Search as SearchIcon, SlidersHorizontal, X, Gem, Map as MapIcon, LayoutGrid, Star } from "lucide-react";
 
 const ExploreMap = lazy(() =>
   import("@/components/ExploreMap").then((m) => ({ default: m.ExploreMap })),
@@ -97,6 +97,27 @@ function Explore() {
   });
 
   const results = data ?? [];
+
+  // --- two-way map ⇄ list selection ---
+  const [selected, setSelected] = useState<string | null>(null);
+  const listRef = useRef<HTMLDivElement | null>(null);
+  const itemRefs = useRef<Record<string, HTMLButtonElement | null>>({});
+
+  // Drop a selection that no longer exists in the filtered results.
+  useEffect(() => {
+    if (selected && !results.some((r) => r.slug === selected)) setSelected(null);
+  }, [results, selected]);
+
+  // Scroll the list to the selected place (pin click → list highlight).
+  useEffect(() => {
+    if (!selected) return;
+    const el = itemRefs.current[selected];
+    const container = listRef.current;
+    if (!el || !container) return;
+    const top = el.offsetTop - container.offsetTop - container.clientHeight / 2 + el.clientHeight / 2;
+    container.scrollTo({ top: Math.max(0, top), behavior: "smooth" });
+  }, [selected]);
+
   const activeCount =
     (cat !== "all" ? 1 : 0) + (region !== "all" ? 1 : 0) + (state ? 1 : 0) +
     (season !== "any" ? 1 : 0) + (budget !== "any" ? 1 : 0) + (hiddenOnly ? 1 : 0);
@@ -258,11 +279,64 @@ function Explore() {
           <button onClick={clearAll} className="mt-3 text-primary font-medium">Reset filters</button>
         </div>
       ) : view === "map" ? (
-        <ClientOnly fallback={<div className="h-[60vh] rounded-2xl bg-muted animate-pulse" />}>
-          <Suspense fallback={<div className="h-[60vh] rounded-2xl bg-muted animate-pulse" />}>
-            <ExploreMap places={results} />
-          </Suspense>
-        </ClientOnly>
+        <div className="grid lg:grid-cols-[340px_1fr] gap-4">
+          {/* Synced list — clicking an item pans + opens its pin */}
+          <div
+            ref={listRef}
+            className="order-2 lg:order-1 h-[70vh] overflow-y-auto rounded-2xl border border-border bg-card p-2 space-y-1.5"
+          >
+            {results.map((t) => {
+              const isSel = t.slug === selected;
+              const hasCoords = t.latitude != null && t.longitude != null;
+              return (
+                <button
+                  key={t.slug}
+                  ref={(el) => { itemRefs.current[t.slug] = el; }}
+                  onClick={() => setSelected(isSel ? null : t.slug)}
+                  disabled={!hasCoords}
+                  className={`w-full text-left flex gap-3 p-2 rounded-xl border transition ${
+                    isSel
+                      ? "border-primary bg-primary/10 ring-1 ring-primary"
+                      : "border-transparent hover:bg-accent"
+                  } ${hasCoords ? "" : "opacity-50 cursor-not-allowed"}`}
+                  aria-pressed={isSel}
+                >
+                  <div className="size-14 shrink-0 rounded-lg overflow-hidden bg-muted">
+                    <TempleImage slug={t.slug} src={t.hero_image} alt={t.name} loading="lazy" className="size-full object-cover" />
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <div className="text-sm font-medium leading-tight line-clamp-1">{t.name}</div>
+                    <div className="text-[11px] text-muted-foreground line-clamp-1">
+                      {t.city ? `${t.city}, ${t.state}` : t.state}
+                    </div>
+                    <div className="mt-0.5 flex items-center gap-2 text-[11px] text-muted-foreground">
+                      <span className="inline-flex items-center gap-0.5">
+                        <Star className="size-3 fill-gold text-gold" />{t.rating ?? "4.5"}
+                      </span>
+                      {isSel && (
+                        <Link
+                          to="/temple/$slug"
+                          params={{ slug: t.slug }}
+                          className="text-primary font-medium"
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          View details →
+                        </Link>
+                      )}
+                    </div>
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+          <div className="order-1 lg:order-2">
+            <ClientOnly fallback={<div className="h-[70vh] rounded-2xl bg-muted animate-pulse" />}>
+              <Suspense fallback={<div className="h-[70vh] rounded-2xl bg-muted animate-pulse" />}>
+                <ExploreMap places={results} selectedSlug={selected} onSelect={setSelected} />
+              </Suspense>
+            </ClientOnly>
+          </div>
+        </div>
       ) : (
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
           {results.map((t) => <TempleCard key={t.slug} t={t} />)}

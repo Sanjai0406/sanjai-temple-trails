@@ -128,7 +128,7 @@ function HomePage() {
 
       {/* TODAY'S SUGGESTION */}
       <section className="mx-auto max-w-7xl px-4 mt-12">
-        {today && (
+        {mounted && today && (
           <>
           <div className="text-xs uppercase tracking-wider text-muted-foreground">Today's suggestion</div>
           <Link
