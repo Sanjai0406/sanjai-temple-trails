@@ -97,6 +97,27 @@ function Explore() {
   });
 
   const results = data ?? [];
+
+  // --- two-way map ⇄ list selection ---
+  const [selected, setSelected] = useState<string | null>(null);
+  const listRef = useRef<HTMLDivElement | null>(null);
+  const itemRefs = useRef<Record<string, HTMLButtonElement | null>>({});
+
+  // Drop a selection that no longer exists in the filtered results.
+  useEffect(() => {
+    if (selected && !results.some((r) => r.slug === selected)) setSelected(null);
+  }, [results, selected]);
+
+  // Scroll the list to the selected place (pin click → list highlight).
+  useEffect(() => {
+    if (!selected) return;
+    const el = itemRefs.current[selected];
+    const container = listRef.current;
+    if (!el || !container) return;
+    const top = el.offsetTop - container.offsetTop - container.clientHeight / 2 + el.clientHeight / 2;
+    container.scrollTo({ top: Math.max(0, top), behavior: "smooth" });
+  }, [selected]);
+
   const activeCount =
     (cat !== "all" ? 1 : 0) + (region !== "all" ? 1 : 0) + (state ? 1 : 0) +
     (season !== "any" ? 1 : 0) + (budget !== "any" ? 1 : 0) + (hiddenOnly ? 1 : 0);
