@@ -35,6 +35,7 @@ export const Route = createFileRoute("/explore")({
     budget: str(s.budget),
     hidden: s.hidden === true || s.hidden === "true" ? true : undefined,
     sort: str(s.sort),
+    view: s.view === "map" ? "map" : undefined,
   }),
   head: () => ({
     meta: [
