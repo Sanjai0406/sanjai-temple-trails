@@ -1,10 +1,15 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { useMemo, useState } from "react";
+import { lazy, Suspense, useMemo, useState } from "react";
+import { ClientOnly } from "@tanstack/react-router";
 import { listTemples, placeFilterOptions } from "@/lib/temples.functions";
 import { TempleCard } from "@/components/TempleCard";
 import { CATEGORIES, REGIONS, SEASONS, BUDGET_BANDS } from "@/lib/constants";
-import { Search as SearchIcon, SlidersHorizontal, X, Gem } from "lucide-react";
+import { Search as SearchIcon, SlidersHorizontal, X, Gem, Map as MapIcon, LayoutGrid } from "lucide-react";
+
+const ExploreMap = lazy(() =>
+  import("@/components/ExploreMap").then((m) => ({ default: m.ExploreMap })),
+);
 
 type SearchParams = {
   q?: string;
