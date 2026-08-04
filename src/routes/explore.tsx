@@ -20,6 +20,7 @@ type SearchParams = {
   budget?: string;
   hidden?: boolean;
   sort?: string;
+  view?: "map" | "grid";
 };
 
 const str = (v: unknown) => (typeof v === "string" && v ? v : undefined);
