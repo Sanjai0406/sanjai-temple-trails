@@ -20,7 +20,7 @@ function FitBounds({ places }: { places: MapPlace[] }) {
   const map = useMap();
   useEffect(() => {
     if (!map || places.length === 0) return;
-    const g = (window as unknown as { google?: typeof google }).google;
+    const g = (window as unknown as { google?: any }).google;
     if (!g?.maps) return;
     const bounds = new g.maps.LatLngBounds();
     places.forEach((p) => bounds.extend({ lat: Number(p.latitude), lng: Number(p.longitude) }));
