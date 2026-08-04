@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo } from "react";
 import { Link } from "@tanstack/react-router";
 import { APIProvider, Map, Marker, InfoWindow, useMap } from "@vis.gl/react-google-maps";
 import { MapPin, Star, X } from "lucide-react";
@@ -16,70 +16,97 @@ export type MapPlace = {
   longitude: number | null;
 };
 
-function FitBounds({ places }: { places: MapPlace[] }) {
+function FitBounds({ places, hasSelection }: { places: MapPlace[]; hasSelection: boolean }) {
   const map = useMap();
   useEffect(() => {
-    if (!map || places.length === 0) return;
+    if (!map || places.length === 0 || hasSelection) return;
     const g = (window as unknown as { google?: any }).google;
     if (!g?.maps) return;
     const bounds = new g.maps.LatLngBounds();
     places.forEach((p) => bounds.extend({ lat: Number(p.latitude), lng: Number(p.longitude) }));
-    if (places.length === 1) map.setCenter(bounds.getCenter()), map.setZoom(9);
-    else map.fitBounds(bounds, 48);
+    if (places.length === 1) {
+      map.setCenter(bounds.getCenter());
+      map.setZoom(9);
+    } else {
+      map.fitBounds(bounds, 48);
+    }
+    // Only refit when the result set itself changes.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [map, places]);
   return null;
 }
 
-export function ExploreMap({ places }: { places: MapPlace[] }) {
+/** Pans (and gently zooms in) to the selected pin whenever the selection changes. */
+function PanToSelected({ place }: { place: MapPlace | null }) {
+  const map = useMap();
+  useEffect(() => {
+    if (!map || !place) return;
+    map.panTo({ lat: Number(place.latitude), lng: Number(place.longitude) });
+    const z = map.getZoom() ?? 6;
+    if (z < 9) map.setZoom(9);
+  }, [map, place?.slug]);
+  return null;
+}
+
+export function ExploreMap({
+  places,
+  selectedSlug,
+  onSelect,
+}: {
+  places: MapPlace[];
+  selectedSlug: string | null;
+  onSelect: (slug: string | null) => void;
+}) {
   const key = import.meta.env.VITE_LOVABLE_CONNECTOR_GOOGLE_MAPS_BROWSER_KEY as string | undefined;
-  const [activeSlug, setActiveSlug] = useState<string | null>(null);
 
   const pins = useMemo(
     () => places.filter((p) => p.latitude != null && p.longitude != null),
     [places],
   );
-  const active = pins.find((p) => p.slug === activeSlug) ?? null;
-
-  useEffect(() => {
-    if (activeSlug && !pins.some((p) => p.slug === activeSlug)) setActiveSlug(null);
-  }, [pins, activeSlug]);
+  const active = pins.find((p) => p.slug === selectedSlug) ?? null;
 
   if (!key) {
     return (
-      <div className="h-[60vh] rounded-2xl border border-border grid place-items-center text-sm text-muted-foreground">
+      <div className="h-full min-h-[60vh] rounded-2xl border border-border grid place-items-center text-sm text-muted-foreground">
         Map unavailable — no maps key configured.
       </div>
     );
   }
 
   return (
-    <div className="relative rounded-2xl overflow-hidden border border-border">
+    <div className="relative rounded-2xl overflow-hidden border border-border h-[70vh]">
       <APIProvider apiKey={key}>
         <Map
           defaultCenter={{ lat: 11.1, lng: 78.6 }}
           defaultZoom={6}
           gestureHandling="greedy"
-          disableDefaultUI={false}
           mapTypeControl={false}
           streetViewControl={false}
-          style={{ width: "100%", height: "60vh" }}
+          onClick={() => onSelect(null)}
+          style={{ width: "100%", height: "100%" }}
         >
-          <FitBounds places={pins} />
-          {pins.map((p) => (
-            <Marker
-              key={p.slug}
-              position={{ lat: Number(p.latitude), lng: Number(p.longitude) }}
-              title={p.name}
-              onClick={() => setActiveSlug(p.slug)}
-            />
-          ))}
+          <FitBounds places={pins} hasSelection={!!active} />
+          <PanToSelected place={active} />
+          {pins.map((p) => {
+            const isActive = p.slug === selectedSlug;
+            return (
+              <Marker
+                key={p.slug}
+                position={{ lat: Number(p.latitude), lng: Number(p.longitude) }}
+                title={p.name}
+                zIndex={isActive ? 999 : undefined}
+                animation={isActive ? 1 : undefined}
+                onClick={() => onSelect(p.slug)}
+              />
+            );
+          })}
           {active && (
             <InfoWindow
               position={{ lat: Number(active.latitude), lng: Number(active.longitude) }}
-              onCloseClick={() => setActiveSlug(null)}
+              onCloseClick={() => onSelect(null)}
               headerDisabled
             >
-              <div className="w-56">
+              <div className="w-52">
                 <Link to="/temple/$slug" params={{ slug: active.slug }} className="block group">
                   <div className="aspect-[4/3] overflow-hidden rounded-lg bg-muted">
                     <TempleImage
@@ -112,7 +139,7 @@ export function ExploreMap({ places }: { places: MapPlace[] }) {
         </Map>
       </APIProvider>
 
-      <div className="absolute top-3 left-3 glass rounded-full px-3 py-1.5 text-xs font-medium">
+      <div className="absolute top-3 left-3 glass rounded-full px-3 py-1.5 text-xs font-medium pointer-events-none">
         {pins.length} pin{pins.length === 1 ? "" : "s"}
         {pins.length < places.length && (
           <span className="text-muted-foreground"> · {places.length - pins.length} without coordinates</span>
@@ -120,9 +147,9 @@ export function ExploreMap({ places }: { places: MapPlace[] }) {
       </div>
       {active && (
         <button
-          onClick={() => setActiveSlug(null)}
+          onClick={() => onSelect(null)}
           className="absolute top-3 right-3 glass rounded-full p-1.5"
-          aria-label="Close details"
+          aria-label="Clear selection"
         >
           <X className="size-4" />
         </button>
