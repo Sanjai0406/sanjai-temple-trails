@@ -215,22 +215,54 @@ function Explore() {
           {activeCount > 0 && ` · ${activeCount} filter${activeCount === 1 ? "" : "s"} active`}
           {options ? ` · ${options.total} in catalog` : ""}
         </div>
-        {(activeCount > 0 || q) && (
-          <button onClick={clearAll} className="text-primary font-medium inline-flex items-center gap-1">
-            <X className="size-3.5" /> Clear all
-          </button>
-        )}
+        <div className="flex items-center gap-3">
+          {(activeCount > 0 || q) && (
+            <button onClick={clearAll} className="text-primary font-medium inline-flex items-center gap-1">
+              <X className="size-3.5" /> Clear all
+            </button>
+          )}
+          <div className="inline-flex rounded-xl border border-border bg-card p-0.5">
+            <button
+              onClick={() => set({ view: undefined })}
+              className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-[10px] text-xs font-medium transition ${
+                view === "grid" ? "bg-primary text-primary-foreground" : "hover:bg-accent"
+              }`}
+              aria-pressed={view === "grid"}
+            >
+              <LayoutGrid className="size-3.5" /> Grid
+            </button>
+            <button
+              onClick={() => set({ view: "map" })}
+              className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-[10px] text-xs font-medium transition ${
+                view === "map" ? "bg-primary text-primary-foreground" : "hover:bg-accent"
+              }`}
+              aria-pressed={view === "map"}
+            >
+              <MapIcon className="size-3.5" /> Map
+            </button>
+          </div>
+        </div>
       </div>
 
       {isLoading ? (
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-          {Array.from({ length: 8 }).map((_, i) => <div key={i} className="aspect-[4/3] bg-muted animate-pulse rounded-xl" />)}
-        </div>
+        view === "map" ? (
+          <div className="h-[60vh] rounded-2xl bg-muted animate-pulse" />
+        ) : (
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+            {Array.from({ length: 8 }).map((_, i) => <div key={i} className="aspect-[4/3] bg-muted animate-pulse rounded-xl" />)}
+          </div>
+        )
       ) : results.length === 0 ? (
         <div className="text-center py-20">
           <div className="text-muted-foreground">No places match these filters.</div>
           <button onClick={clearAll} className="mt-3 text-primary font-medium">Reset filters</button>
         </div>
+      ) : view === "map" ? (
+        <ClientOnly fallback={<div className="h-[60vh] rounded-2xl bg-muted animate-pulse" />}>
+          <Suspense fallback={<div className="h-[60vh] rounded-2xl bg-muted animate-pulse" />}>
+            <ExploreMap places={results} />
+          </Suspense>
+        </ClientOnly>
       ) : (
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
           {results.map((t) => <TempleCard key={t.slug} t={t} />)}
