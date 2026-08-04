@@ -1,11 +1,11 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, ClientOnly, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { lazy, Suspense, useMemo, useState } from "react";
-import { ClientOnly } from "@tanstack/react-router";
+import { lazy, Suspense, useEffect, useMemo, useRef, useState } from "react";
 import { listTemples, placeFilterOptions } from "@/lib/temples.functions";
 import { TempleCard } from "@/components/TempleCard";
+import { TempleImage } from "@/components/TempleImage";
 import { CATEGORIES, REGIONS, SEASONS, BUDGET_BANDS } from "@/lib/constants";
-import { Search as SearchIcon, SlidersHorizontal, X, Gem, Map as MapIcon, LayoutGrid } from "lucide-react";
+import { Search as SearchIcon, SlidersHorizontal, X, Gem, Map as MapIcon, LayoutGrid, Star } from "lucide-react";
 
 const ExploreMap = lazy(() =>
   import("@/components/ExploreMap").then((m) => ({ default: m.ExploreMap })),
