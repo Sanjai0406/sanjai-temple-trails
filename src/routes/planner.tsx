@@ -91,6 +91,25 @@ function Planner() {
 
       <div className="grid lg:grid-cols-[380px_1fr] gap-6">
         <div className="temple-card p-5 space-y-4 h-fit lg:sticky lg:top-20">
+          {stopLabel && (
+            <div className="rounded-xl border border-primary/40 bg-primary/10 p-3">
+              <div className="flex items-start justify-between gap-2">
+                <div>
+                  <div className="text-[11px] font-medium text-primary uppercase tracking-wide">Next stop</div>
+                  <div className="text-sm font-semibold leading-tight mt-0.5 inline-flex items-center gap-1">
+                    <MapPin className="size-3.5 text-primary" /> {stopLabel}
+                  </div>
+                  <div className="text-[11px] text-muted-foreground mt-1">
+                    {[seasonDef?.label, band?.label, categoryDef?.label].filter(Boolean).join(" · ") || "Using your Explore filters"}
+                  </div>
+                </div>
+                <button onClick={clearStop} aria-label="Clear next stop" className="text-muted-foreground hover:text-foreground">
+                  <X className="size-4" />
+                </button>
+              </div>
+            </div>
+          )}
+
           <Field label="Starting city">
             <input value={start} onChange={(e) => setStart(e.target.value)} className="input" />
           </Field>
