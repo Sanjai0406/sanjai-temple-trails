@@ -1,11 +1,13 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
-import { useMutation } from "@tanstack/react-query";
+import { useEffect, useRef, useState } from "react";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { generateItinerary, saveItinerary, type GeneratedItinerary } from "@/lib/trips.functions";
-import { VISITED_SEED, BUDGET_BANDS, SEASONS, CATEGORIES } from "@/lib/constants";
+import { getProfile } from "@/lib/profile.functions";
+import { VISITED_SEED, BUDGET_BANDS, SEASONS, CATEGORIES, REGIONS } from "@/lib/constants";
 import { Sparkles, Loader2, IndianRupee, Save, MapPin, X } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+
 
 type PlannerSearch = {
   stop?: string;
