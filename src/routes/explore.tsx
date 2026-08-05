@@ -5,7 +5,7 @@ import { listTemples, placeFilterOptions } from "@/lib/temples.functions";
 import { TempleCard } from "@/components/TempleCard";
 import { TempleImage } from "@/components/TempleImage";
 import { CATEGORIES, REGIONS, SEASONS, BUDGET_BANDS } from "@/lib/constants";
-import { Search as SearchIcon, SlidersHorizontal, X, Gem, Map as MapIcon, LayoutGrid, Star } from "lucide-react";
+import { Search as SearchIcon, SlidersHorizontal, X, Gem, Map as MapIcon, LayoutGrid, Star, Sparkles } from "lucide-react";
 
 const ExploreMap = lazy(() =>
   import("@/components/ExploreMap").then((m) => ({ default: m.ExploreMap })),
@@ -332,7 +332,27 @@ function Explore() {
           <div className="order-1 lg:order-2">
             <ClientOnly fallback={<div className="h-[70vh] rounded-2xl bg-muted animate-pulse" />}>
               <Suspense fallback={<div className="h-[70vh] rounded-2xl bg-muted animate-pulse" />}>
-                <ExploreMap places={results} selectedSlug={selected} onSelect={setSelected} />
+                <ExploreMap
+                  places={results}
+                  selectedSlug={selected}
+                  onSelect={setSelected}
+                  renderCardAction={(p) => (
+                    <Link
+                      to="/planner"
+                      search={{
+                        stop: p.name,
+                        stopCity: p.city ?? undefined,
+                        stopState: p.state,
+                        budget: budget !== "any" ? budget : undefined,
+                        season: season !== "any" ? season : undefined,
+                        category: cat !== "all" ? cat : undefined,
+                      }}
+                      className="w-full inline-flex items-center justify-center gap-1.5 h-8 rounded-lg gradient-hero text-primary-foreground text-xs font-semibold"
+                    >
+                      <Sparkles className="size-3.5" /> Plan next stop
+                    </Link>
+                  )}
+                />
               </Suspense>
             </ClientOnly>
           </div>

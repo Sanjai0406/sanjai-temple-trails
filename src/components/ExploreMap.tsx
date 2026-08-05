@@ -135,6 +135,7 @@ export function ExploreMap({
                   </div>
                   <div className="mt-2 text-xs font-medium text-primary">View details →</div>
                 </Link>
+                {renderCardAction && <div className="mt-2">{renderCardAction(active)}</div>}
               </div>
             </InfoWindow>
           )}
