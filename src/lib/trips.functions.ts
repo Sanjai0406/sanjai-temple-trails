@@ -48,6 +48,8 @@ export const generateItinerary = createServerFn({ method: "POST" })
     food_preference?: string;
     walking_difficulty?: string;
     avoid?: string[];
+    focus_place?: string;
+    season?: string;
   }) => data)
   .handler(async ({ data }) => {
     const key = process.env.LOVABLE_API_KEY;
@@ -62,6 +64,8 @@ Focus on temples (famous, hidden, ancient, UNESCO), spiritual places, nature, hi
 Respect food preference, walking difficulty and budget. Reply with valid JSON only.`;
 
     const prompt = `Plan a ${data.days}-day trip starting from ${data.start_city}.
+${data.focus_place ? `The trip MUST include ${data.focus_place} as the first main stop (Day 1), then continue with nearby places.` : ""}
+${data.season ? `Season context: ${data.season}. Prefer places that are at their best then.` : ""}
 Budget: ₹${data.budget} total. Travel mode: ${data.travel_mode}. Food: ${data.food_preference ?? "vegetarian"}.
 Walking: ${data.walking_difficulty ?? "moderate"}. Temple preference: ${data.temple_preference ?? "any"}.
 Interests: ${data.interests.join(", ")}.
