@@ -52,10 +52,12 @@ export function ExploreMap({
   places,
   selectedSlug,
   onSelect,
+  renderCardAction,
 }: {
   places: MapPlace[];
   selectedSlug: string | null;
   onSelect: (slug: string | null) => void;
+  renderCardAction?: (place: MapPlace) => React.ReactNode;
 }) {
   const key = import.meta.env.VITE_LOVABLE_CONNECTOR_GOOGLE_MAPS_BROWSER_KEY as string | undefined;
 
@@ -133,6 +135,7 @@ export function ExploreMap({
                   </div>
                   <div className="mt-2 text-xs font-medium text-primary">View details →</div>
                 </Link>
+                {renderCardAction && <div className="mt-2">{renderCardAction(active)}</div>}
               </div>
             </InfoWindow>
           )}

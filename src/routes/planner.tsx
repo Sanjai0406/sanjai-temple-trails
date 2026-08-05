@@ -2,12 +2,31 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { generateItinerary, saveItinerary, type GeneratedItinerary } from "@/lib/trips.functions";
-import { VISITED_SEED } from "@/lib/constants";
-import { Sparkles, Loader2, IndianRupee, Save } from "lucide-react";
+import { VISITED_SEED, BUDGET_BANDS, SEASONS, CATEGORIES } from "@/lib/constants";
+import { Sparkles, Loader2, IndianRupee, Save, MapPin, X } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 
+type PlannerSearch = {
+  stop?: string;
+  stopCity?: string;
+  stopState?: string;
+  budget?: string;
+  season?: string;
+  category?: string;
+};
+
+const str = (v: unknown) => (typeof v === "string" && v ? v : undefined);
+
 export const Route = createFileRoute("/planner")({
+  validateSearch: (s: Record<string, unknown>): PlannerSearch => ({
+    stop: str(s.stop),
+    stopCity: str(s.stopCity),
+    stopState: str(s.stopState),
+    budget: str(s.budget),
+    season: str(s.season),
+    category: str(s.category),
+  }),
   head: () => ({ meta: [{ title: "AI Trip Planner · Sanjai's Travel AI" }, { name: "description", content: "Plan a personalized temple trip with AI." }] }),
   component: Planner,
 });
@@ -15,22 +34,43 @@ export const Route = createFileRoute("/planner")({
 const INTERESTS = ["Temples", "Hidden gems", "Hill stations", "Waterfalls", "Beaches", "Heritage", "Food", "Photography"];
 
 function Planner() {
+  const search = Route.useSearch();
+  const navigate = Route.useNavigate();
+
+  const band = BUDGET_BANDS.find((b) => b.id === search.budget);
+  const seasonDef = SEASONS.find((s) => s.id === search.season && s.id !== "any");
+  const categoryDef = CATEGORIES.find((c) => c.id === search.category && c.id !== "all");
+
+  const stopLabel = search.stop
+    ? [search.stop, search.stopCity, search.stopState].filter(Boolean).join(", ")
+    : null;
+
   const [days, setDays] = useState(2);
-  const [budget, setBudget] = useState(5000);
+  const [budget, setBudget] = useState(band?.max ?? band?.min ?? 5000);
   const [travelMode, setTravelMode] = useState("car");
   const [start, setStart] = useState("Chennai");
-  const [interests, setInterests] = useState<string[]>(["Temples", "Hidden gems"]);
+  const [interests, setInterests] = useState<string[]>(
+    categoryDef ? ["Temples", "Hidden gems", categoryDef.label] : ["Temples", "Hidden gems"],
+  );
   const [food, setFood] = useState("vegetarian");
   const [walking, setWalking] = useState("moderate");
   const [plan, setPlan] = useState<GeneratedItinerary | null>(null);
 
+  const clearStop = () => navigate({ search: () => ({}) as PlannerSearch });
+
   const gen = useMutation({
     mutationFn: () => generateItinerary({
-      data: { days, budget, travel_mode: travelMode, start_city: start, interests, food_preference: food, walking_difficulty: walking, avoid: VISITED_SEED },
+      data: {
+        days, budget, travel_mode: travelMode, start_city: start, interests,
+        food_preference: food, walking_difficulty: walking, avoid: VISITED_SEED,
+        focus_place: stopLabel ?? undefined,
+        season: seasonDef?.label,
+      },
     }),
     onSuccess: (p) => { setPlan(p); toast.success("Your itinerary is ready 🛕"); },
     onError: (e: Error) => toast.error(e.message),
   });
+
 
   const save = useMutation({
     mutationFn: async () => {
@@ -51,6 +91,25 @@ function Planner() {
 
       <div className="grid lg:grid-cols-[380px_1fr] gap-6">
         <div className="temple-card p-5 space-y-4 h-fit lg:sticky lg:top-20">
+          {stopLabel && (
+            <div className="rounded-xl border border-primary/40 bg-primary/10 p-3">
+              <div className="flex items-start justify-between gap-2">
+                <div>
+                  <div className="text-[11px] font-medium text-primary uppercase tracking-wide">Next stop</div>
+                  <div className="text-sm font-semibold leading-tight mt-0.5 inline-flex items-center gap-1">
+                    <MapPin className="size-3.5 text-primary" /> {stopLabel}
+                  </div>
+                  <div className="text-[11px] text-muted-foreground mt-1">
+                    {[seasonDef?.label, band?.label, categoryDef?.label].filter(Boolean).join(" · ") || "Using your Explore filters"}
+                  </div>
+                </div>
+                <button onClick={clearStop} aria-label="Clear next stop" className="text-muted-foreground hover:text-foreground">
+                  <X className="size-4" />
+                </button>
+              </div>
+            </div>
+          )}
+
           <Field label="Starting city">
             <input value={start} onChange={(e) => setStart(e.target.value)} className="input" />
           </Field>
