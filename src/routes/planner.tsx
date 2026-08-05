@@ -35,6 +35,19 @@ export const Route = createFileRoute("/planner")({
 
 const INTERESTS = ["Temples", "Hidden gems", "Hill stations", "Waterfalls", "Beaches", "Heritage", "Food", "Photography"];
 
+const regionOf = (state?: string) =>
+  REGIONS.find((r) => r.id !== "all" && (r.states as readonly string[]).includes(state ?? ""))?.id ?? null;
+
+/** Rough trip length: same state = weekend, same region = 3 days, far away = 5 days. */
+function estimateDays(homeState?: string | null, stopState?: string | null) {
+  if (!stopState) return 2;
+  if (homeState && stopState.toLowerCase() === homeState.toLowerCase()) return 2;
+  const a = regionOf(homeState ?? undefined);
+  const b = regionOf(stopState);
+  if (a && b && a === b) return 3;
+  return 5;
+}
+
 function Planner() {
   const search = Route.useSearch();
   const navigate = Route.useNavigate();
@@ -58,7 +71,25 @@ function Planner() {
   const [walking, setWalking] = useState("moderate");
   const [plan, setPlan] = useState<GeneratedItinerary | null>(null);
 
+  // Prefill from saved travel preferences (only until the user edits the form).
+  const { data: profile } = useQuery({ queryKey: ["profile"], queryFn: () => getProfile(), retry: false });
+  const prefilled = useRef(false);
+  useEffect(() => {
+    if (!profile || prefilled.current) return;
+    prefilled.current = true;
+    const p = profile as Record<string, unknown>;
+    if (typeof p.preferred_travel_mode === "string") setTravelMode(p.preferred_travel_mode);
+    if (typeof p.food_preference === "string") setFood(p.food_preference);
+    if (typeof p.walking_difficulty === "string") setWalking(p.walking_difficulty);
+    if (typeof p.home_city === "string" && p.home_city) setStart(p.home_city);
+    const d = estimateDays(typeof p.home_state === "string" ? p.home_state : null, search.stopState);
+    setDays(d);
+    if (!band && typeof p.daily_budget === "number" && p.daily_budget > 0) setBudget(p.daily_budget * d);
+  }, [profile, search.stopState, band]);
+
   const clearStop = () => navigate({ search: () => ({}) as PlannerSearch });
+
+
 
   const gen = useMutation({
     mutationFn: () => generateItinerary({
