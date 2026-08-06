@@ -7,6 +7,8 @@ import { VISITED_SEED, BUDGET_BANDS, SEASONS, CATEGORIES, REGIONS } from "@/lib/
 import { Sparkles, Loader2, IndianRupee, Save, MapPin, X } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { getTripForecast } from "@/lib/weather.functions";
+import { DayWeather } from "@/components/DayWeather";
 
 
 type PlannerSearch = {
@@ -70,6 +72,22 @@ function Planner() {
   const [food, setFood] = useState("vegetarian");
   const [walking, setWalking] = useState("moderate");
   const [plan, setPlan] = useState<GeneratedItinerary | null>(null);
+  const [startDate, setStartDate] = useState(() => new Date().toISOString().slice(0, 10));
+
+  const forecastPlace = stopLabel ?? start;
+  const { data: forecast } = useQuery({
+    queryKey: ["trip-forecast", forecastPlace],
+    queryFn: () => getTripForecast({ data: { place: forecastPlace, days: 10, startDate } }),
+    enabled: !!plan && !!forecastPlace,
+    staleTime: 30 * 60 * 1000,
+  });
+
+  const dateForDay = (day: number) => {
+    const d = new Date(`${startDate}T00:00:00`);
+    if (Number.isNaN(d.getTime())) return undefined;
+    d.setDate(d.getDate() + day - 1);
+    return d.toISOString().slice(0, 10);
+  };
 
   // Prefill from saved travel preferences (only until the user edits the form).
   const { data: profile } = useQuery({ queryKey: ["profile"], queryFn: () => getProfile(), retry: false });
@@ -145,6 +163,9 @@ function Planner() {
 
           <Field label="Starting city">
             <input value={start} onChange={(e) => setStart(e.target.value)} className="input" />
+          </Field>
+          <Field label="Trip start date">
+            <input type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} className="input" />
           </Field>
           <Field label={`Days: ${days}`}>
             <input type="range" min={1} max={10} value={days} onChange={(e) => setDays(+e.target.value)} className="w-full accent-primary" />
@@ -223,6 +244,11 @@ function Planner() {
                     <h3 className="font-display text-xl font-bold">Day {d.day} · {d.title}</h3>
                     {d.estimated_cost != null && <div className="text-sm text-muted-foreground">₹{d.estimated_cost.toLocaleString("en-IN")}</div>}
                   </div>
+                  <DayWeather
+                    date={dateForDay(d.day)}
+                    forecast={forecast?.days?.find((f) => f.date === dateForDay(d.day))}
+                    seasonLabel={seasonDef?.label}
+                  />
                   <ul className="mt-3 space-y-2 text-sm">
                     {d.morning && <Row k="🌅 Morning" v={d.morning} />}
                     {d.breakfast && <Row k="🍽️ Breakfast" v={d.breakfast} />}
