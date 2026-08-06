@@ -4,11 +4,12 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import { generateItinerary, saveItinerary, type GeneratedItinerary } from "@/lib/trips.functions";
 import { getProfile } from "@/lib/profile.functions";
 import { VISITED_SEED, BUDGET_BANDS, SEASONS, CATEGORIES, REGIONS } from "@/lib/constants";
-import { Sparkles, Loader2, IndianRupee, Save, MapPin, X } from "lucide-react";
+import { Sparkles, Loader2, IndianRupee, Save, MapPin, X, CloudRain } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { getTripForecast } from "@/lib/weather.functions";
 import { DayWeather } from "@/components/DayWeather";
+import { adjustDayForWeather, type AdjustedDay } from "@/lib/weather-adjust";
 
 
 type PlannerSearch = {
@@ -72,6 +73,7 @@ function Planner() {
   const [food, setFood] = useState("vegetarian");
   const [walking, setWalking] = useState("moderate");
   const [plan, setPlan] = useState<GeneratedItinerary | null>(null);
+  const [adaptToWeather, setAdaptToWeather] = useState(true);
   const [startDate, setStartDate] = useState(() => new Date().toISOString().slice(0, 10));
 
   const forecastPlace = stopLabel ?? start;
@@ -206,6 +208,10 @@ function Planner() {
               })}
             </div>
           </Field>
+          <label className="flex items-center gap-2 text-xs text-muted-foreground cursor-pointer">
+            <input type="checkbox" checked={adaptToWeather} onChange={(e) => setAdaptToWeather(e.target.checked)} className="accent-primary size-4" />
+            Auto-adjust each day to the forecast
+          </label>
           <button
             disabled={gen.isPending}
             onClick={() => gen.mutate()}
@@ -240,7 +246,7 @@ function Planner() {
 
               {plan.days.map((d) => {
                 const f = forecast?.days?.find((x) => x.date === dateForDay(d.day));
-                const adj = adaptToWeather ? adjustDayForWeather(d, f) : { values: {}, changes: [] };
+                const adj: AdjustedDay = adaptToWeather ? adjustDayForWeather(d, f) : { values: {}, changes: [] };
                 const val = (k: keyof typeof d) => (adj.values[k] as string | undefined) ?? (d[k] as string | undefined);
                 const orig = (k: keyof typeof d) => (adj.values[k] ? (d[k] as string | undefined) : undefined);
                 return (
@@ -313,8 +319,18 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
     </label>
   );
 }
-function Row({ k, v }: { k: string; v: string }) {
-  return <li className="flex gap-2"><span className="shrink-0 text-muted-foreground w-28">{k}</span><span className="flex-1">{v}</span></li>;
+function Row({ k, v, was }: { k: string; v: string; was?: string }) {
+  return (
+    <li className="flex gap-2">
+      <span className="shrink-0 text-muted-foreground w-28">{k}</span>
+      <span className="flex-1">
+        {v}
+        {was && (
+          <span className="block text-xs text-muted-foreground line-through mt-0.5">{was}</span>
+        )}
+      </span>
+    </li>
+  );
 }
 function ListCard({ title, items }: { title: string; items: string[] }) {
   return (
