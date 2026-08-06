@@ -238,7 +238,12 @@ function Planner() {
                 </div>
               </div>
 
-              {plan.days.map((d) => (
+              {plan.days.map((d) => {
+                const f = forecast?.days?.find((x) => x.date === dateForDay(d.day));
+                const adj = adaptToWeather ? adjustDayForWeather(d, f) : { values: {}, changes: [] };
+                const val = (k: keyof typeof d) => (adj.values[k] as string | undefined) ?? (d[k] as string | undefined);
+                const orig = (k: keyof typeof d) => (adj.values[k] ? (d[k] as string | undefined) : undefined);
+                return (
                 <div key={d.day} className="temple-card p-5">
                   <div className="flex items-baseline justify-between">
                     <h3 className="font-display text-xl font-bold">Day {d.day} · {d.title}</h3>
@@ -246,23 +251,41 @@ function Planner() {
                   </div>
                   <DayWeather
                     date={dateForDay(d.day)}
-                    forecast={forecast?.days?.find((f) => f.date === dateForDay(d.day))}
+                    forecast={f}
                     seasonLabel={seasonDef?.label}
                   />
+                  {adaptToWeather && adj.headline && (
+                    <div className={`mt-2 rounded-xl border p-3 text-xs ${adj.changes.length ? "border-primary/40 bg-primary/10" : "border-border bg-card"}`}>
+                      <div className="font-semibold text-foreground inline-flex items-center gap-1.5">
+                        <CloudRain className="size-3.5 text-primary" /> {adj.headline}
+                      </div>
+                      {adj.changes.length > 0 && (
+                        <ul className="mt-1.5 space-y-1 text-muted-foreground">
+                          {adj.changes.map((c, i) => (
+                            <li key={i}>
+                              <span className="text-foreground font-medium">{c.label}</span> adjusted — {c.reason}
+                            </li>
+                          ))}
+                        </ul>
+                      )}
+                    </div>
+                  )}
                   <ul className="mt-3 space-y-2 text-sm">
-                    {d.morning && <Row k="🌅 Morning" v={d.morning} />}
+                    {val("morning") && <Row k="🌅 Morning" v={val("morning")!} was={orig("morning")} />}
                     {d.breakfast && <Row k="🍽️ Breakfast" v={d.breakfast} />}
-                    {d.temple && <Row k="🛕 Temple" v={d.temple} />}
+                    {val("temple") && <Row k="🛕 Temple" v={val("temple")!} was={orig("temple")} />}
                     {d.nearby && <Row k="📿 Nearby" v={d.nearby} />}
                     {d.lunch && <Row k="🍛 Lunch" v={d.lunch} />}
-                    {d.scenic && <Row k="🌳 Afternoon" v={d.scenic} />}
-                    {d.sunset && <Row k="🌇 Sunset" v={d.sunset} />}
+                    {val("scenic") && <Row k="🌳 Afternoon" v={val("scenic")!} was={orig("scenic")} />}
+                    {val("sunset") && <Row k="🌇 Sunset" v={val("sunset")!} was={orig("sunset")} />}
                     {d.dinner && <Row k="🌙 Dinner" v={d.dinner} />}
                     {d.return_home && <Row k="🏠 Return" v={d.return_home} />}
-                    {d.notes && <Row k="💡 Notes" v={d.notes} />}
+                    {val("notes") && <Row k="💡 Notes" v={val("notes")!} was={orig("notes")} />}
                   </ul>
                 </div>
-              ))}
+                );
+              })}
+
 
               <div className="grid md:grid-cols-2 gap-4">
                 <ListCard title="Travel tips" items={plan.travel_tips} />
