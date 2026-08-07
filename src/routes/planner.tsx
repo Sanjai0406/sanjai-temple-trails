@@ -4,12 +4,14 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import { generateItinerary, saveItinerary, type GeneratedItinerary } from "@/lib/trips.functions";
 import { getProfile } from "@/lib/profile.functions";
 import { VISITED_SEED, BUDGET_BANDS, SEASONS, CATEGORIES, REGIONS } from "@/lib/constants";
-import { Sparkles, Loader2, IndianRupee, Save, MapPin, X, CloudRain } from "lucide-react";
+import { Sparkles, Loader2, IndianRupee, Save, MapPin, X, CloudRain, FileDown } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { getTripForecast } from "@/lib/weather.functions";
 import { DayWeather } from "@/components/DayWeather";
 import { adjustDayForWeather, type AdjustedDay } from "@/lib/weather-adjust";
+import { downloadItineraryPdf } from "@/lib/itinerary-pdf";
+
 
 
 type PlannerSearch = {
@@ -135,6 +137,26 @@ function Planner() {
     onError: (e: Error) => toast.error(e.message),
   });
 
+  const exportPdf = () => {
+    if (!plan) return;
+    try {
+      downloadItineraryPdf(
+        plan,
+        plan.days.map((d) => {
+          const date = dateForDay(d.day);
+          const f = forecast?.days?.find((x) => x.date === date);
+          return { day: d, date, forecast: f, adjusted: adaptToWeather ? adjustDayForWeather(d, f) : undefined };
+        }),
+        { startCity: start, travelMode },
+      );
+      toast.success("PDF downloaded");
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Could not create PDF");
+    }
+  };
+
+
+
   return (
     <div className="mx-auto max-w-6xl px-4 py-8">
       <div className="mb-6">
@@ -238,9 +260,14 @@ function Planner() {
                     <p className="text-sm text-muted-foreground mt-1">{plan.summary}</p>
                     <div className="text-sm mt-2">Estimated total: <span className="font-semibold">₹{plan.total_cost?.toLocaleString("en-IN")}</span></div>
                   </div>
-                  <button onClick={() => save.mutate()} disabled={save.isPending} className="px-3 py-2 rounded-lg border border-border bg-card hover:bg-accent text-sm inline-flex items-center gap-1">
-                    <Save className="size-4" /> Save
-                  </button>
+                  <div className="flex shrink-0 gap-2">
+                    <button onClick={exportPdf} className="px-3 py-2 rounded-lg border border-border bg-card hover:bg-accent text-sm inline-flex items-center gap-1">
+                      <FileDown className="size-4" /> PDF
+                    </button>
+                    <button onClick={() => save.mutate()} disabled={save.isPending} className="px-3 py-2 rounded-lg border border-border bg-card hover:bg-accent text-sm inline-flex items-center gap-1">
+                      <Save className="size-4" /> Save
+                    </button>
+                  </div>
                 </div>
               </div>
 
