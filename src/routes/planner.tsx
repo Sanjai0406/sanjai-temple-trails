@@ -137,6 +137,26 @@ function Planner() {
     onError: (e: Error) => toast.error(e.message),
   });
 
+  const exportPdf = () => {
+    if (!plan) return;
+    try {
+      downloadItineraryPdf(
+        plan,
+        plan.days.map((d) => {
+          const date = dateForDay(d.day);
+          const f = forecast?.days?.find((x) => x.date === date);
+          return { day: d, date, forecast: f, adjusted: adaptToWeather ? adjustDayForWeather(d, f) : undefined };
+        }),
+        { startCity: start, travelMode },
+      );
+      toast.success("PDF downloaded");
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Could not create PDF");
+    }
+  };
+
+
+
   return (
     <div className="mx-auto max-w-6xl px-4 py-8">
       <div className="mb-6">
