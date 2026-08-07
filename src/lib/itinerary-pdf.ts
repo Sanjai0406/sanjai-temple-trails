@@ -10,6 +10,17 @@ export type PdfDay = {
   adjusted?: AdjustedDay;
 };
 
+/** jsPDF core fonts are WinAnsi-only; map common typographic chars. */
+const clean = (s: string) =>
+  s
+    .replace(/\u2192/g, "->")
+    .replace(/[\u2018\u2019]/g, "'")
+    .replace(/[\u201C\u201D]/g, '"')
+    .replace(/\u2026/g, "...")
+    .replace(/[\u2013\u2014]/g, "-")
+    .replace(/[\u2022\u00B7]/g, "-")
+    .replace(/[^\u0000-\u00FF]/g, "");
+
 const rs = (n?: number | null) => (typeof n === "number" ? `Rs. ${n.toLocaleString("en-IN")}` : "-");
 
 const fmtDate = (iso?: string) =>
@@ -53,7 +64,7 @@ export function buildItineraryPdf(plan: GeneratedItinerary, days: PdfDay[], meta
     doc.setFontSize(size);
     doc.setTextColor(...(opts.color ?? [40, 34, 28]));
     const indent = opts.indent ?? 0;
-    const lines = doc.splitTextToSize(s, W - M * 2 - indent) as string[];
+    const lines = doc.splitTextToSize(clean(s), W - M * 2 - indent) as string[];
     const lh = size * 1.35;
     for (const line of lines) {
       nl(lh);
@@ -69,7 +80,7 @@ export function buildItineraryPdf(plan: GeneratedItinerary, days: PdfDay[], meta
   doc.setTextColor(255, 250, 242);
   doc.setFont("helvetica", "bold");
   doc.setFontSize(19);
-  doc.text(doc.splitTextToSize(plan.title, W - M * 2)[0], M, 46);
+  doc.text(doc.splitTextToSize(clean(plan.title), W - M * 2)[0], M, 46);
   doc.setFont("helvetica", "normal");
   doc.setFontSize(10);
   doc.text("Sanjai's Travel AI  -  itinerary export", M, 68);
@@ -124,7 +135,7 @@ export function buildItineraryPdf(plan: GeneratedItinerary, days: PdfDay[], meta
       doc.setFont("helvetica", "bold");
       doc.setFontSize(size);
       doc.setTextColor(120, 108, 96);
-      const lines = doc.splitTextToSize(value, W - M * 2 - 84) as string[];
+      const lines = doc.splitTextToSize(clean(value), W - M * 2 - 84) as string[];
       nl(lh * lines.length);
       doc.text(label, M, y);
       doc.setFont("helvetica", "normal");
