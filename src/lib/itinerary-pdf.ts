@@ -25,8 +25,8 @@ const fmtDate = (iso?: string) =>
 const weatherLine = (f?: DayForecast) => {
   if (!f) return "Forecast not available yet - seasonal averages apply";
   const parts = [
-    f.max != null ? `${Math.round(f.max)}째C` : null,
-    f.min != null ? `low ${Math.round(f.min)}째C` : null,
+    f.max != null ? `${Math.round(f.max)}\u00B0C` : null,
+    f.min != null ? `low ${Math.round(f.min)}\u00B0C` : null,
     f.condition || null,
     f.rain != null ? `${f.rain}% rain` : null,
   ].filter(Boolean);
