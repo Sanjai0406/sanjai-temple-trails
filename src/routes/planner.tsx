@@ -285,11 +285,32 @@ function Planner() {
                     <h3 className="font-display text-xl font-bold">Day {d.day} · {d.title}</h3>
                     {d.estimated_cost != null && <div className="text-sm text-muted-foreground">₹{d.estimated_cost.toLocaleString("en-IN")}</div>}
                   </div>
-                  <DayWeather
-                    date={dateForDay(d.day)}
-                    forecast={f}
-                    seasonLabel={seasonDef?.label}
-                  />
+                  <div className="mt-1 flex flex-wrap items-center gap-2">
+                    <DayWeather
+                      date={dateForDay(d.day)}
+                      forecast={f}
+                      seasonLabel={seasonDef?.label}
+                    />
+                    <label className="inline-flex items-center gap-1 text-xs text-muted-foreground">
+                      <span className="sr-only">Date for day {d.day}</span>
+                      <input
+                        type="date"
+                        value={dateForDay(d.day) ?? ""}
+                        onChange={(e) => setDayDates((m) => ({ ...m, [d.day]: e.target.value }))}
+                        className="input h-8 py-0 text-xs w-[9.5rem]"
+                      />
+                      {dayDates[d.day] && (
+                        <button
+                          type="button"
+                          onClick={() => setDayDates(({ [d.day]: _, ...rest }) => rest)}
+                          className="underline hover:text-foreground"
+                        >
+                          reset
+                        </button>
+                      )}
+                    </label>
+                  </div>
+
                   {adaptToWeather && adj.headline && (
                     <div className={`mt-2 rounded-xl border p-3 text-xs ${adj.changes.length ? "border-primary/40 bg-primary/10" : "border-border bg-card"}`}>
                       <div className="font-semibold text-foreground inline-flex items-center gap-1.5">
