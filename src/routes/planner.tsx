@@ -77,16 +77,19 @@ function Planner() {
   const [plan, setPlan] = useState<GeneratedItinerary | null>(null);
   const [adaptToWeather, setAdaptToWeather] = useState(true);
   const [startDate, setStartDate] = useState(() => new Date().toISOString().slice(0, 10));
+  // Per-day date overrides (day number -> ISO date); cleared when the start date changes.
+  const [dayDates, setDayDates] = useState<Record<number, string>>({});
 
   const forecastPlace = stopLabel ?? start;
   const { data: forecast } = useQuery({
-    queryKey: ["trip-forecast", forecastPlace],
+    queryKey: ["trip-forecast", forecastPlace, startDate],
     queryFn: () => getTripForecast({ data: { place: forecastPlace, days: 10, startDate } }),
     enabled: !!plan && !!forecastPlace,
     staleTime: 30 * 60 * 1000,
   });
 
   const dateForDay = (day: number) => {
+    if (dayDates[day]) return dayDates[day];
     const d = new Date(`${startDate}T00:00:00`);
     if (Number.isNaN(d.getTime())) return undefined;
     d.setDate(d.getDate() + day - 1);
