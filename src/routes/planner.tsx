@@ -192,7 +192,7 @@ function Planner() {
             <input value={start} onChange={(e) => setStart(e.target.value)} className="input" />
           </Field>
           <Field label="Trip start date">
-            <input type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} className="input" />
+            <input type="date" value={startDate} onChange={(e) => { setStartDate(e.target.value); setDayDates({}); }} className="input" />
           </Field>
           <Field label={`Days: ${days}`}>
             <input type="range" min={1} max={10} value={days} onChange={(e) => setDays(+e.target.value)} className="w-full accent-primary" />
