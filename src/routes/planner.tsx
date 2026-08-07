@@ -260,9 +260,14 @@ function Planner() {
                     <p className="text-sm text-muted-foreground mt-1">{plan.summary}</p>
                     <div className="text-sm mt-2">Estimated total: <span className="font-semibold">₹{plan.total_cost?.toLocaleString("en-IN")}</span></div>
                   </div>
-                  <button onClick={() => save.mutate()} disabled={save.isPending} className="px-3 py-2 rounded-lg border border-border bg-card hover:bg-accent text-sm inline-flex items-center gap-1">
-                    <Save className="size-4" /> Save
-                  </button>
+                  <div className="flex shrink-0 gap-2">
+                    <button onClick={exportPdf} className="px-3 py-2 rounded-lg border border-border bg-card hover:bg-accent text-sm inline-flex items-center gap-1">
+                      <FileDown className="size-4" /> PDF
+                    </button>
+                    <button onClick={() => save.mutate()} disabled={save.isPending} className="px-3 py-2 rounded-lg border border-border bg-card hover:bg-accent text-sm inline-flex items-center gap-1">
+                      <Save className="size-4" /> Save
+                    </button>
+                  </div>
                 </div>
               </div>
 
