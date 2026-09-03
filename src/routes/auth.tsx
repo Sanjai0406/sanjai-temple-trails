@@ -12,7 +12,7 @@ export const Route = createFileRoute("/auth")({
       { name: "description", content: "Sign in with Google, email or continue as guest." },
     ],
   }),
-  validateSearch: (search: Record<string, unknown>) => ({
+  validateSearch: (search: Record<string, unknown>): { next?: string } => ({
     next: typeof search.next === "string" && search.next.startsWith("/") && !search.next.startsWith("//")
       ? search.next
       : undefined,
