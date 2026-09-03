@@ -13,12 +13,15 @@ import { Route as WishlistRouteImport } from './routes/wishlist'
 import { Route as VisitedRouteImport } from './routes/visited'
 import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as PlannerRouteImport } from './routes/planner'
+import { Route as McpRouteImport } from './routes/mcp'
 import { Route as ExploreRouteImport } from './routes/explore'
 import { Route as ChatRouteImport } from './routes/chat'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as TempleSlugRouteImport } from './routes/temple.$slug'
 import { Route as ApiChatRouteImport } from './routes/api/chat'
+import { Route as Char91DotwellKnownChar93OauthProtectedResourceRouteImport } from './routes/[.well-known]/oauth-protected-resource'
+import { Route as DotlovableOauthConsentRouteImport } from './routes/[.]lovable.oauth.consent'
 
 const WishlistRoute = WishlistRouteImport.update({
   id: '/wishlist',
@@ -38,6 +41,11 @@ const ProfileRoute = ProfileRouteImport.update({
 const PlannerRoute = PlannerRouteImport.update({
   id: '/planner',
   path: '/planner',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const McpRoute = McpRouteImport.update({
+  id: '/mcp',
+  path: '/mcp',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ExploreRoute = ExploreRouteImport.update({
@@ -70,30 +78,47 @@ const ApiChatRoute = ApiChatRouteImport.update({
   path: '/api/chat',
   getParentRoute: () => rootRouteImport,
 } as any)
+const Char91DotwellKnownChar93OauthProtectedResourceRoute =
+  Char91DotwellKnownChar93OauthProtectedResourceRouteImport.update({
+    id: '/.well-known/oauth-protected-resource',
+    path: '/.well-known/oauth-protected-resource',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const DotlovableOauthConsentRoute = DotlovableOauthConsentRouteImport.update({
+  id: '/.lovable/oauth/consent',
+  path: '/.lovable/oauth/consent',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/chat': typeof ChatRoute
   '/explore': typeof ExploreRoute
+  '/mcp': typeof McpRoute
   '/planner': typeof PlannerRoute
   '/profile': typeof ProfileRoute
   '/visited': typeof VisitedRoute
   '/wishlist': typeof WishlistRoute
+  '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/api/chat': typeof ApiChatRoute
   '/temple/$slug': typeof TempleSlugRoute
+  '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/chat': typeof ChatRoute
   '/explore': typeof ExploreRoute
+  '/mcp': typeof McpRoute
   '/planner': typeof PlannerRoute
   '/profile': typeof ProfileRoute
   '/visited': typeof VisitedRoute
   '/wishlist': typeof WishlistRoute
+  '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/api/chat': typeof ApiChatRoute
   '/temple/$slug': typeof TempleSlugRoute
+  '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -101,12 +126,15 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/chat': typeof ChatRoute
   '/explore': typeof ExploreRoute
+  '/mcp': typeof McpRoute
   '/planner': typeof PlannerRoute
   '/profile': typeof ProfileRoute
   '/visited': typeof VisitedRoute
   '/wishlist': typeof WishlistRoute
+  '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/api/chat': typeof ApiChatRoute
   '/temple/$slug': typeof TempleSlugRoute
+  '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -115,36 +143,45 @@ export interface FileRouteTypes {
     | '/auth'
     | '/chat'
     | '/explore'
+    | '/mcp'
     | '/planner'
     | '/profile'
     | '/visited'
     | '/wishlist'
+    | '/.well-known/oauth-protected-resource'
     | '/api/chat'
     | '/temple/$slug'
+    | '/.lovable/oauth/consent'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/auth'
     | '/chat'
     | '/explore'
+    | '/mcp'
     | '/planner'
     | '/profile'
     | '/visited'
     | '/wishlist'
+    | '/.well-known/oauth-protected-resource'
     | '/api/chat'
     | '/temple/$slug'
+    | '/.lovable/oauth/consent'
   id:
     | '__root__'
     | '/'
     | '/auth'
     | '/chat'
     | '/explore'
+    | '/mcp'
     | '/planner'
     | '/profile'
     | '/visited'
     | '/wishlist'
+    | '/.well-known/oauth-protected-resource'
     | '/api/chat'
     | '/temple/$slug'
+    | '/.lovable/oauth/consent'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -152,12 +189,15 @@ export interface RootRouteChildren {
   AuthRoute: typeof AuthRoute
   ChatRoute: typeof ChatRoute
   ExploreRoute: typeof ExploreRoute
+  McpRoute: typeof McpRoute
   PlannerRoute: typeof PlannerRoute
   ProfileRoute: typeof ProfileRoute
   VisitedRoute: typeof VisitedRoute
   WishlistRoute: typeof WishlistRoute
+  Char91DotwellKnownChar93OauthProtectedResourceRoute: typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   ApiChatRoute: typeof ApiChatRoute
   TempleSlugRoute: typeof TempleSlugRoute
+  DotlovableOauthConsentRoute: typeof DotlovableOauthConsentRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -188,6 +228,13 @@ declare module '@tanstack/react-router' {
       path: '/planner'
       fullPath: '/planner'
       preLoaderRoute: typeof PlannerRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/mcp': {
+      id: '/mcp'
+      path: '/mcp'
+      fullPath: '/mcp'
+      preLoaderRoute: typeof McpRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/explore': {
@@ -232,6 +279,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiChatRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/.well-known/oauth-protected-resource': {
+      id: '/.well-known/oauth-protected-resource'
+      path: '/.well-known/oauth-protected-resource'
+      fullPath: '/.well-known/oauth-protected-resource'
+      preLoaderRoute: typeof Char91DotwellKnownChar93OauthProtectedResourceRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/.lovable/oauth/consent': {
+      id: '/.lovable/oauth/consent'
+      path: '/.lovable/oauth/consent'
+      fullPath: '/.lovable/oauth/consent'
+      preLoaderRoute: typeof DotlovableOauthConsentRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -240,13 +301,27 @@ const rootRouteChildren: RootRouteChildren = {
   AuthRoute: AuthRoute,
   ChatRoute: ChatRoute,
   ExploreRoute: ExploreRoute,
+  McpRoute: McpRoute,
   PlannerRoute: PlannerRoute,
   ProfileRoute: ProfileRoute,
   VisitedRoute: VisitedRoute,
   WishlistRoute: WishlistRoute,
+  Char91DotwellKnownChar93OauthProtectedResourceRoute:
+    Char91DotwellKnownChar93OauthProtectedResourceRoute,
   ApiChatRoute: ApiChatRoute,
   TempleSlugRoute: TempleSlugRoute,
+  DotlovableOauthConsentRoute: DotlovableOauthConsentRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}

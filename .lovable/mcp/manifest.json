@@ -1,0 +1,214 @@
+{
+  "version": 1,
+  "sdk_version": "1.0.0",
+  "path": "/mcp",
+  "auth": {
+    "type": "oauth",
+    "issuer": "https://kqmyuxdmngqkztnxuiql.supabase.co/auth/v1",
+    "accepted_audiences": [
+      "authenticated"
+    ]
+  },
+  "mcp": {
+    "server": {
+      "name": "sanjai-s-sacred-journeys",
+      "version": "0.1.0",
+      "title": "Sanjai's Sacred Journeys"
+    },
+    "tools": [
+      {
+        "name": "search_places",
+        "title": "Search temples and destinations",
+        "description": "Search the public catalog of temples, hidden gems and travel spots across Tamil Nadu and India by keyword, state, category or budget.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {
+            "query": {
+              "description": "Free text: name, city, deity, district or speciality.",
+              "type": "string"
+            },
+            "state": {
+              "description": "Filter by Indian state, e.g. 'Tamil Nadu'.",
+              "type": "string"
+            },
+            "category": {
+              "description": "Category filter, e.g. 'temple', 'nature', 'heritage'.",
+              "type": "string"
+            },
+            "hidden_gems_only": {
+              "description": "Only return underrated / hidden-gem places.",
+              "type": "boolean"
+            },
+            "max_budget": {
+              "description": "Maximum estimated budget in INR.",
+              "type": "number",
+              "exclusiveMinimum": 0
+            },
+            "limit": {
+              "description": "Max rows to return (default 15).",
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 50
+            }
+          }
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "get_place",
+        "title": "Get place details",
+        "description": "Fetch full details for one temple or destination by its slug (history, timings, dress code, budget, best time).",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {
+            "slug": {
+              "type": "string",
+              "minLength": 1,
+              "description": "Place slug, e.g. 'brihadeeswarar-temple'."
+            }
+          },
+          "required": [
+            "slug"
+          ]
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "list_wishlist",
+        "title": "List my wishlist",
+        "description": "List the signed-in user's saved wishlist places.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {}
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "add_to_wishlist",
+        "title": "Add to my wishlist",
+        "description": "Save a place to the signed-in user's wishlist, either by catalog slug or as a custom place.",
+        "annotations": {
+          "readOnlyHint": false,
+          "destructiveHint": false,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {
+            "slug": {
+              "description": "Catalog slug of the place to save.",
+              "type": "string"
+            },
+            "custom_name": {
+              "description": "Name of a place not in the catalog.",
+              "type": "string"
+            },
+            "custom_location": {
+              "description": "City/state for a custom place.",
+              "type": "string"
+            },
+            "note": {
+              "description": "Personal note about why to visit.",
+              "type": "string"
+            }
+          }
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "list_visited",
+        "title": "List places I have visited",
+        "description": "List the signed-in user's visited places with dates, ratings and notes.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {}
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "log_visit",
+        "title": "Log a visited place",
+        "description": "Record that the signed-in user visited a place, with optional date, rating and notes.",
+        "annotations": {
+          "readOnlyHint": false,
+          "destructiveHint": false,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {
+            "place_name": {
+              "type": "string",
+              "minLength": 1,
+              "description": "Name of the place visited."
+            },
+            "place_state": {
+              "description": "State the place is in.",
+              "type": "string"
+            },
+            "visit_date": {
+              "description": "Visit date in YYYY-MM-DD.",
+              "type": "string"
+            },
+            "rating": {
+              "description": "Rating out of 5.",
+              "type": "number",
+              "minimum": 1,
+              "maximum": 5
+            },
+            "notes": {
+              "description": "Memories or tips from the visit.",
+              "type": "string"
+            }
+          },
+          "required": [
+            "place_name"
+          ]
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "list_itineraries",
+        "title": "List my saved trips",
+        "description": "List the signed-in user's saved trip itineraries with their day-by-day plans.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {}
+        },
+        "outputSchema": null
+      }
+    ]
+  }
+}

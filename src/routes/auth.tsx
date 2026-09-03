@@ -12,26 +12,42 @@ export const Route = createFileRoute("/auth")({
       { name: "description", content: "Sign in with Google, email or continue as guest." },
     ],
   }),
+  validateSearch: (search: Record<string, unknown>): { next?: string } => ({
+    next: typeof search.next === "string" && search.next.startsWith("/") && !search.next.startsWith("//")
+      ? search.next
+      : undefined,
+  }),
   component: AuthPage,
 });
 
+function safeNext(next?: string) {
+  return next && next.startsWith("/") && !next.startsWith("//") ? next : undefined;
+}
+
 function AuthPage() {
   const navigate = useNavigate();
+  const { next } = Route.useSearch();
+  const target = safeNext(next);
+  const goNext = () => {
+    if (target) window.location.href = target;
+    else navigate({ to: "/" });
+  };
   const [mode, setMode] = useState<"signin" | "signup">("signin");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [busy, setBusy] = useState(false);
 
   useEffect(() => {
-    supabase.auth.getUser().then(({ data }) => { if (data.user) navigate({ to: "/" }); });
-  }, [navigate]);
+    supabase.auth.getUser().then(({ data }) => { if (data.user) goNext(); });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [navigate, target]);
 
   const google = async () => {
     setBusy(true);
-    const res = await lovable.auth.signInWithOAuth("google", { redirect_uri: window.location.origin });
+    const res = await lovable.auth.signInWithOAuth("google", { redirect_uri: target ? window.location.origin + target : window.location.origin });
     if (res.error) { toast.error(res.error.message ?? "Google sign-in failed"); setBusy(false); return; }
     if (res.redirected) return;
-    navigate({ to: "/" });
+    goNext();
   };
 
   const emailAuth = async () => {
@@ -39,12 +55,12 @@ function AuthPage() {
     setBusy(true);
     const fn = mode === "signin"
       ? supabase.auth.signInWithPassword({ email, password })
-      : supabase.auth.signUp({ email, password, options: { emailRedirectTo: window.location.origin } });
+      : supabase.auth.signUp({ email, password, options: { emailRedirectTo: target ? window.location.origin + target : window.location.origin } });
     const { error } = await fn;
     setBusy(false);
     if (error) return toast.error(error.message);
     toast.success(mode === "signin" ? "Welcome back, Sanjai 🙏" : "Account created!");
-    navigate({ to: "/" });
+    goNext();
   };
 
   return (
